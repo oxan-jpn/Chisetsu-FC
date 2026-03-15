@@ -1,0 +1,62 @@
+/* ================================
+   ハンバーガーメニュー
+================================ */
+#hamburger {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    width: 32px;
+    height: 24px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+#hamburger span {
+    display: block;
+    height: 4px;
+    background-color: var(--navy);
+    margin: 5px 0;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+/* ================================
+   サイドナビ
+================================ */
+#side-nav {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 240px;
+    height: 100%;
+    background-color: var(--navy);
+    color: var(--white);
+    padding: 60px 20px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+    transition: left 0.3s ease;
+    z-index: 999;
+}
+
+#side-nav.open {
+    left: 0;
+}
+
+#side-nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+#side-nav li {
+    margin: 20px 0;
+}
+
+#side-nav a {
+    color: var(--white);
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+
+#side-nav a:hover {
+    color: var(--main-red);
+}
