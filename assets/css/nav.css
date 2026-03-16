@@ -31,9 +31,33 @@
     flex: 1;
 }
 
-/* ハンバーガーのアニメーション */
+/* ================================
+   ハンバーガーボタン
+================================ */
+#hamburger {
+    width: 32px;
+    height: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+#hamburger span {
+    display: block;
+    width: 100%;
+    height: 4px;
+    background: var(--white);
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+/* アニメーション */
 #hamburger.active span:nth-child(1) {
-    transform: translateY(9px) rotate(45deg);
+    transform: translateY(10px) rotate(45deg);
 }
 
 #hamburger.active span:nth-child(2) {
@@ -41,6 +65,47 @@
 }
 
 #hamburger.active span:nth-child(3) {
-    transform: translateY(-9px) rotate(-45deg);
+    transform: translateY(-10px) rotate(-45deg);
 }
 
+/* ================================
+   サイドナビ
+================================ */
+#side-nav {
+    position: fixed;
+    top: 0;
+    right: -260px;
+    width: 240px;
+    height: 100vh;
+    background: var(--navy);
+    color: var(--white);
+    padding-top: 80px;
+    transition: right 0.3s ease;
+    z-index: 999;
+}
+
+#side-nav.open {
+    right: 0;
+}
+
+#side-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#side-nav li {
+    margin: 0;
+}
+
+#side-nav a {
+    display: block;
+    padding: 16px;
+    color: var(--white);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+#side-nav a:hover {
+    background: rgba(255,255,255,0.1);
+}
