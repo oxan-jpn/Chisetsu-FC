@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/nav.css">
     <script src="../assets/js/main.js" defer></script>
-    <script src="../assets/js/header.js" defer></script>
+    <script type="module" src="../assets/js/header.js"></script>
 </head>
 <body>
 
@@ -15,18 +15,18 @@
 <header id="site-header">
     <div class="header-inner">
 
-        <!-- 左：空白 or ロゴを置くならここ -->
+        <!-- 左：ロゴや空白 -->
         <div class="header-left"></div>
 
         <!-- 中央：タイトル -->
         <h1 class="site-title">Chisetsu FC</h1>
 
-        <!-- 右：ハンバーガーメニュー -->
-        <div id="hamburger">
+        <!-- 右：ハンバーガー -->
+        <button id="hamburger" aria-label="メニューを開閉">
             <span></span>
             <span></span>
             <span></span>
-        </div>
+        </button>
 
     </div>
 
