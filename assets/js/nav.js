@@ -7,16 +7,16 @@ export function initNavigation() {
         return;
     }
 
-    // 初期状態を必ず閉じる
+    // 初期状態を閉じる
     closeNav();
 
     // ハンバーガー開閉
     hamburger.addEventListener("click", (e) => {
-        e.stopPropagation(); // 外側クリック判定を防ぐ
+        e.stopPropagation();
         toggleNav();
     });
 
-    // 外側クリックで閉じる（pointerdown の方がスマホで安定）
+    // 外側クリックで閉じる
     document.addEventListener("pointerdown", (e) => {
         const insideNav = sideNav.contains(e.target);
         const insideHamburger = hamburger.contains(e.target);
@@ -24,9 +24,9 @@ export function initNavigation() {
         if (!insideNav && !insideHamburger) {
             closeNav();
         }
-    }, true); // キャプチャフェーズで実行
+    }, true);
 
-    // メニュー内リンククリック時は閉じる（遅延）
+    // メニュー内リンククリック時は閉じる
     sideNav.querySelectorAll("a").forEach(link => {
         link.addEventListener("click", () => {
             setTimeout(() => closeNav(), 50);
