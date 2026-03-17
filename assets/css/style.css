@@ -221,3 +221,28 @@ table th {
     border-radius: 6px;
     margin-top: 12px;
 }
+
+/* ================================
+   News Item Layout
+================================ */
+.news-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.news-item:last-child {
+    border-bottom: none;
+}
+
+.news-date,
+.news-title,
+.news-link {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.news-link a {
+    color: var(--navy);
+    text-decoration: underline;
+    font-weight: bold;
+}
