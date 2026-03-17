@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function renderUpcomingMatches() {
     const tbody = document.getElementById("schedule-body");
     const showMoreBtn = document.getElementById("show-more");
+    const section = document.getElementById("upcoming-matches");
 
     const today = new Date();
 
@@ -15,6 +16,18 @@ function renderUpcomingMatches() {
         .filter(m => m.result === null && new Date(m.date) >= today)
         .sort((a, b) => new Date(a.date) - new Date(b.date));
 
+    // ★ データがない場合
+    if (upcoming.length === 0) {
+        section.innerHTML += `
+            <div class="empty-message">
+                今シーズンの試合はすべてしゅうりょうしました！<br>
+                応援ありがとうございました！
+            </div>
+        `;
+        return;
+    }
+
+    // 通常表示
     const initial = upcoming.slice(0, 3);
     tbody.innerHTML = initial.map(rowHTML).join("");
 
