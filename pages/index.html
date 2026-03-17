@@ -60,9 +60,20 @@
 <!-- Upcoming Matches Section -->
 <section id="upcoming-matches">
     <h2>直近の試合予定</h2>
+
     <table id="schedule-table">
-        <!-- Schedule will be dynamically loaded here -->
+        <thead>
+            <tr>
+                <th>日付</th>
+                <th>キックオフ</th>
+                <th>場所</th>
+                <th>対戦相手</th>
+            </tr>
+        </thead>
+        <tbody id="schedule-body"></tbody>
     </table>
+
+    <button id="show-more" style="display:none;">もっと見る</button>
 </section>
 
 <!-- Recent Results Section -->
