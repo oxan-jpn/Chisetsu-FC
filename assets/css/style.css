@@ -246,3 +246,9 @@ table th {
     text-decoration: underline;
     font-weight: bold;
 }
+
+.contact-mail {
+    color: var(--navy);
+    font-weight: bold;
+    text-decoration: underline;
+}
