@@ -9,7 +9,6 @@ function renderNews() {
     const list = document.getElementById("news-list");
     const section = document.getElementById("news-section");
 
-    // データがない場合
     if (!newsItems || newsItems.length === 0) {
         section.innerHTML += `
             <div class="empty-message">
@@ -19,23 +18,19 @@ function renderNews() {
         return;
     }
 
-    // 通常表示
     list.innerHTML = newsItems.map(itemHTML).join("");
 }
 
 function itemHTML(n) {
-    if (n.url) {
-        return `
-            <li>
-                <strong>${n.date}</strong> — 
-                <a href="${n.url}">${n.title}</a>
-            </li>
-        `;
-    }
-
     return `
-        <li>
-            <strong>${n.date}</strong> — ${n.title}
+        <li class="news-item">
+            <div class="news-date">${n.date}</div>
+            <div class="news-title">${n.title}</div>
+            ${
+                n.url
+                    ? `<div class="news-link"><a href="${n.url}">${n.linkText}</a></div>`
+                    : ""
+            }
         </li>
     `;
 }
