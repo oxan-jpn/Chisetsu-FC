@@ -171,3 +171,41 @@ table th {
     cursor: pointer;
     font-size: 1rem;
 }
+
+/* ================================
+   Upcoming Matches（試合予定）
+================================ */
+#upcoming-matches table {
+    margin-top: 12px;
+}
+
+#upcoming-matches th,
+#upcoming-matches td {
+    padding: 8px;
+    text-align: left;
+}
+
+#show-more {
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+/* ================================
+   Match Results（試合結果）
+================================ */
+#match-results table {
+    margin-top: 12px;
+}
+
+#match-results th,
+#match-results td {
+    padding: 8px;
+    text-align: left;
+}
+
