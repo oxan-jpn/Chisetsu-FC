@@ -209,3 +209,15 @@ table th {
     text-align: left;
 }
 
+/* ================================
+   Empty State（データなし表示）
+================================ */
+.empty-message {
+    padding: 20px;
+    text-align: center;
+    color: var(--navy);
+    font-size: 1rem;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    margin-top: 12px;
+}
