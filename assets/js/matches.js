@@ -6,8 +6,13 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadMatches() {
-    const upcomingList = document.getElementById("upcoming-matches");
-    const resultsList = document.getElementById("results-list");
+    const upcomingBody = document.getElementById("upcoming-matches");
+    const resultsBody = document.getElementById("results-list");
+
+    if (!upcomingBody || !resultsBody) {
+        console.error("HTML に #upcoming-matches または #results-list がありません");
+        return;
+    }
 
     const { data, error } = await supabase
         .from("matches")
@@ -17,39 +22,45 @@ async function loadMatches() {
 
     if (error) {
         console.error("試合データ取得エラー:", error);
+        upcomingBody.innerHTML = `<tr><td colspan="5">試合データの取得に失敗しました</td></tr>`;
+        resultsBody.innerHTML = `<tr><td colspan="5">試合データの取得に失敗しました</td></tr>`;
         return;
     }
 
-    // 今日の日付
+    if (!data || data.length === 0) {
+        upcomingBody.innerHTML = `<tr><td colspan="5">今年の試合は全て終了しました！<br>
+        応援いただきありがとうございました！</td></tr>`;
+        resultsBody.innerHTML = `<tr><td colspan="5">試合結果はありません</td></tr>`;
+        return;
+    }
+
     const today = new Date().toISOString().split("T")[0];
 
-    // 予定と結果に分類
-    const upcoming = data.filter(m => m.date >= today && m.result === null);
+    const upcoming = data.filter(m => m.result === null && m.date >= today);
     const results = data.filter(m => m.result !== null);
 
-    // HTML 生成
-    upcomingList.innerHTML = upcoming.map(matchHTML).join("");
-    resultsList.innerHTML = results.map(resultHTML).join("");
+    upcomingBody.innerHTML = upcoming.map(renderUpcomingRow).join("");
+    resultsBody.innerHTML = results.map(renderResultRow).join("");
 }
 
-function matchHTML(m) {
+function renderUpcomingRow(m) {
     const date = new Date(m.date).toLocaleDateString("ja-JP");
 
     return `
-        <li class="match-item">
-            <div class="match-date">${date}</div>
-            <div class="match-kickoff">${m.kickoff}</div>
-            <div class="match-opponent">${m.opponent}</div>
-            <div class="match-place">${m.location}</div>
-            <div class="match-result upcoming">予定</div>
-        </li>
+        <tr>
+            <td>${date}</td>
+            <td>${m.kickoff}</td>
+            <td>${m.opponent}</td>
+            <td>${m.location}</td>
+            <td class="upcoming">予定</td>
+        </tr>
     `;
 }
 
-function resultHTML(m) {
+function renderResultRow(m) {
     const date = new Date(m.date).toLocaleDateString("ja-JP");
 
-    const resultLabel =
+    const label =
         m.result === "win"
             ? `<span class="win">勝ち</span>`
             : m.result === "lose"
@@ -57,14 +68,12 @@ function resultHTML(m) {
             : `<span class="draw">引き分け</span>`;
 
     return `
-        <li class="match-item">
-            <div class="match-date">${date}</div>
-            <div class="match-kickoff">${m.kickoff}</div>
-            <div class="match-opponent">${m.opponent}</div>
-            <div class="match-place">${m.location}</div>
-            <div class="match-result">
-                ${resultLabel} ${m.score_for} - ${m.score_against}
-            </div>
-        </li>
+        <tr>
+            <td>${date}</td>
+            <td>${m.kickoff}</td>
+            <td>${m.opponent}</td>
+            <td>${m.location}</td>
+            <td>${label} ${m.score_for} - ${m.score_against}</td>
+        </tr>
     `;
 }
