@@ -1,15 +1,31 @@
 // assets/js/news.js
-import { newsItems } from "../data/newsList.js";
+import { supabase } from "./supabaseClient.js"; // ← Supabase クライアントを読み込む
 
 document.addEventListener("DOMContentLoaded", () => {
-    renderNews();
+    fetchNews();
 });
 
-function renderNews() {
+async function fetchNews() {
     const list = document.getElementById("news-list");
     const section = document.getElementById("news-section");
 
-    if (!newsItems || newsItems.length === 0) {
+    const { data, error } = await supabase
+        .from("news")
+        .select("*")
+        .eq("published", true)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error("ニュース取得エラー:", error);
+        section.innerHTML += `
+            <div class="empty-message">
+                お知らせの取得に失敗しました
+            </div>
+        `;
+        return;
+    }
+
+    if (!data || data.length === 0) {
         section.innerHTML += `
             <div class="empty-message">
                 最近のお知らせはありません
@@ -18,17 +34,19 @@ function renderNews() {
         return;
     }
 
-    list.innerHTML = newsItems.map(itemHTML).join("");
+    list.innerHTML = data.map(itemHTML).join("");
 }
 
 function itemHTML(n) {
+    const date = new Date(n.created_at).toLocaleDateString("ja-JP");
+
     return `
         <li class="news-item">
-            <div class="news-date">${n.date}</div>
+            <div class="news-date">${date}</div>
             <div class="news-title">${n.title}</div>
             ${
                 n.url
-                    ? `<div class="news-link"><a href="${n.url}">${n.linkText}</a></div>`
+                    ? `<div class="news-link"><a href="${n.url}">${n.link_text ?? "詳しくはこちら"}</a></div>`
                     : ""
             }
         </li>
