@@ -220,15 +220,23 @@ table th {
     color: #fff;
     border-radius: 6px;
     cursor: pointer;
-    opacity: 0;               /* ← 初期は透明 */
-    pointer-events: none;     /* ← クリック不可 */
-    transition: opacity 0.3s ease;
+
+    /* 初期状態（非表示） */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease,
+        visibility 0s linear 0.3s; /* ← 非表示時は遅延して visibility を切る */
 }
 
-/* 表示状態 */
+/* 表示状態（フェードイン） */
 #back-to-top.show {
-    opacity: .8;
-    pointer-events: auto;     /* ← クリック可能に */
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition-delay: 0s; /* ← 表示時は visibility を即座に visible に */
 }
 
 /* ================================
