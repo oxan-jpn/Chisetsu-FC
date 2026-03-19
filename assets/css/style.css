@@ -216,8 +216,8 @@ table th {
     right: 20px;
     bottom: 20px;
     padding: 10px 14px;
-    background: #333;
-    color: #fff;
+    background: var(--main-red);
+    color: var(--white)!important;
     border-radius: 6px;
     cursor: pointer;
 
