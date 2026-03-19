@@ -280,3 +280,44 @@ table th {
         transform: rotate(360deg);
     }
 }
+
+#site-footer {
+    padding: 32px 16px;
+    background: #f7f7f7;
+    text-align: center;
+}
+
+.footer-instagram {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.footer-instagram:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+.instagram-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.instagram-icon {
+    width: 28px;
+    height: 28px;
+}
+
+.instagram-text {
+    font-size: 15px;
+    font-weight: 600;
+}
+
