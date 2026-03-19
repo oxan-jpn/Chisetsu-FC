@@ -236,7 +236,8 @@ table th {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
-    transition-delay: 0s; /* ← 表示時は visibility を即座に visible に */
+    transition-delay: 0s; 
+    z-index: 1000;
 }
 
 /* ================================
