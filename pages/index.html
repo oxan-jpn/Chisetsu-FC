@@ -41,8 +41,13 @@
 <!-- News Section -->
 <section id="news-section">
     <h2>お知らせ</h2>
-    <ul id="news-list"></ul>
+    <ul id="news-list">
+        <li id="news-loading">
+            <div class="loading-spinner"></div>
+        </li>
+    </ul>
 </section>
+
 
 <!-- Upcoming Matches Section -->
 <section id="upcoming-matches">
@@ -57,7 +62,14 @@
                 <th>対戦相手</th>
             </tr>
         </thead>
-        <tbody id="schedule-body"></tbody>
+        <tbody id="schedule-body">
+            <tr id="schedule-loading">
+                <td colspan="4">
+                    <div class="loading-spinner"></div>
+                </td>
+            </tr>
+        </tbody>
+
     </table>
 
     <button id="show-more" style="display:none;">もっと見る</button>
@@ -75,7 +87,13 @@
                 <th>対戦相手</th>
             </tr>
         </thead>
-        <tbody id="results-body"></tbody>
+        <tbody id="results-body">
+            <tr id="results-loading">
+                <td colspan="3">
+                    <div class="loading-spinner"></div>
+                </td>
+            </tr>
+        </tbody>
     </table>
 </section>
 
