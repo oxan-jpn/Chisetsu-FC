@@ -8,12 +8,16 @@ document.addEventListener("DOMContentLoaded", () => {
 async function fetchNews() {
     const list = document.getElementById("news-list");
     const section = document.getElementById("news-section");
+    const loading = document.getElementById("news-loading"); // ← ローディング要素
 
     const { data, error } = await supabase
         .from("news")
         .select("*")
         .eq("published", true)
         .order("created_at", { ascending: false });
+
+    // 取得完了 → ローディング削除
+    if (loading) loading.remove();
 
     if (error) {
         console.error("ニュース取得エラー:", error);
