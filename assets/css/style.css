@@ -283,7 +283,7 @@ table th {
 }
 
 #site-footer {
-    padding: 32px 16px;
+    padding: 32px 16px 64px 16px;
     background: #f7f7f7;
     text-align: center;
 }
