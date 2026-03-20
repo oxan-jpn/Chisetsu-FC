@@ -51,14 +51,6 @@ a:hover {
     border-bottom: 4px solid var(--main-red);
 }
 
-#hero-image {
-    width: 100%;
-    height: 300px;
-    background-size: cover;
-    background-position: center;
-    margin-bottom: 20px;
-}
-
 #hero h1 {
     font-size: 2.4rem;
     color: var(--main-red);
@@ -67,6 +59,12 @@ a:hover {
 #hero p {
     font-size: 1.2rem;
     color: var(--navy);
+}
+
+#hero img { 
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
 }
 
 /* ================================
