@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>お知らせ管理</title>
+
+  <link rel="stylesheet" href="../../assets/css/admin-news.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- トースト -->
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <div class="container">
+    <h2>お知らせ管理</h2>
+
+    <!-- モード選択 -->
+    <fieldset class="mode-fieldset">
+      <legend>操作を選択</legend>
+      <label>
+        <input type="radio" name="mode" value="create">
+        新規投稿
+      </label>
+      <label>
+        <input type="radio" name="mode" value="edit">
+        投稿修正
+      </label>
+      <label>
+        <input type="radio" name="mode" value="delete">
+        投稿削除
+      </label>
+    </fieldset>
+
+    <!-- 新規投稿フォーム -->
+    <section id="createSection" class="form-section" hidden>
+      <h3>新規投稿</h3>
+
+      <label for="createTitle">タイトル（必須）</label>
+      <input id="createTitle" type="text" autocomplete="off">
+
+      <label for="createBody">本文（任意）</label>
+      <textarea id="createBody"></textarea>
+
+      <label for="createUrl">URL（任意）</label>
+      <input id="createUrl" type="url" autocomplete="off">
+
+      <label for="createLinkText">リンクテキスト（任意）</label>
+      <input id="createLinkText" type="text" autocomplete="off">
+
+      <button id="createSubmit" type="button">投稿する</button>
+    </section>
+
+    <!-- 投稿修正フォーム -->
+    <section id="editSection" class="form-section" hidden>
+      <h3>投稿修正</h3>
+
+      <label for="editSelect">修正する投稿を選択</label>
+      <select id="editSelect"></select>
+
+      <label for="editTitle">タイトル（編集可）</label>
+      <input id="editTitle" type="text" autocomplete="off">
+
+      <label for="editBody">本文（編集可）</label>
+      <textarea id="editBody"></textarea>
+
+      <label for="editUrl">URL（編集可）</label>
+      <input id="editUrl" type="url" autocomplete="off">
+
+      <label for="editLinkText">リンクテキスト（編集可）</label>
+      <input id="editLinkText" type="text" autocomplete="off">
+
+      <button id="editSubmit" type="button">更新する</button>
+    </section>
+
+    <!-- 投稿削除フォーム -->
+    <section id="deleteSection" class="form-section" hidden>
+      <h3>投稿削除</h3>
+
+      <label for="deleteSelect">削除する投稿を選択</label>
+      <select id="deleteSelect"></select>
+
+      <button id="deleteSubmit" type="button" class="danger">削除する</button>
+    </section>
+
+    <p id="inlineMessage" class="inline-message" aria-live="polite"></p>
+  </div>
+
+  <!-- 削除確認モーダル -->
+  <div id="modalOverlay" class="modal-overlay" hidden>
+    <div class="modal">
+      <h3>お知らせの削除</h3>
+      <p id="modalTitle" class="modal-title"></p>
+      <p>本当に削除しますか？</p>
+      <div class="modal-actions">
+        <button id="modalConfirm" type="button" class="danger">削除する</button>
+        <button id="modalCancel" type="button" class="secondary">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/admin-news.js" defer></script>
+</body>
+</html>
