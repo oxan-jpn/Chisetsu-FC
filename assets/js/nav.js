@@ -1,9 +1,3 @@
-/**
- * nav.js
- * ハンバーガーメニューとサイドナビの制御を担当
- * header.html 読み込み後に initNavigation() が呼ばれる前提
- */
-
 export function initNavigation() {
     const hamburger = document.getElementById("hamburger");
     const sideNav = document.getElementById("side-nav");
@@ -13,20 +7,41 @@ export function initNavigation() {
         return;
     }
 
-    // 開閉処理
-    hamburger.addEventListener("click", () => {
-        sideNav.classList.toggle("open");
-        hamburger.classList.toggle("active");
+    // 初期状態を閉じる
+    closeNav();
+
+    // ハンバーガー開閉
+    hamburger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleNav();
     });
 
-    // サイドナビ外をクリックしたら閉じる
-    document.addEventListener("click", (e) => {
-        const clickedInsideNav = sideNav.contains(e.target);
-        const clickedHamburger = hamburger.contains(e.target);
+    // 外側クリックで閉じる
+    document.addEventListener("pointerdown", (e) => {
+        const insideNav = sideNav.contains(e.target);
+        const insideHamburger = hamburger.contains(e.target);
 
-        if (!clickedInsideNav && !clickedHamburger) {
-            sideNav.classList.remove("open");
-            hamburger.classList.remove("active");
+        if (!insideNav && !insideHamburger) {
+            closeNav();
         }
+    }, true);
+
+    // メニュー内リンククリック時は閉じる
+    sideNav.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => {
+            setTimeout(() => closeNav(), 50);
+        });
     });
+
+    function toggleNav() {
+        const isOpen = sideNav.classList.toggle("open");
+        hamburger.classList.toggle("active", isOpen);
+        document.body.style.overflow = isOpen ? "hidden" : "auto";
+    }
+
+    function closeNav() {
+        sideNav.classList.remove("open");
+        hamburger.classList.remove("active");
+        document.body.style.overflow = "auto";
+    }
 }
