@@ -1,6 +1,6 @@
 const supabase = supabase.createClient(
-  "https://YOUR-PROJECT.supabase.co",
-  "YOUR-PUBLIC-ANON-KEY"
+  "https://jyzborkzgcmcqousqopx.supabase.co",
+    "sb_publishable_7jkxGmH3RbdzMAU5cPlTBg_LiVad7Aw"
 );
 
 document.getElementById("loginBtn").addEventListener("click", async () => {
