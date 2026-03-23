@@ -7,7 +7,7 @@ const client = supabase.createClient(
 // すでにログイン済みなら top.html へ
 client.auth.getSession().then(({ data: { session } }) => {
   if (session) {
-    window.location.href = "/pages/admin/top.html";
+    window.location.href = "/Chisetsu-FC/pages/admin/top.html";
   }
 });
 
@@ -35,5 +35,5 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
   }
 
   // ログイン成功
-  window.location.href = "/pages/admin/top.html";
+  window.location.href = "/Chisetsu-FC/pages/admin/top.html";
 });
