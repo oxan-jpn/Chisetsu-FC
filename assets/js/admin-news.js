@@ -46,6 +46,9 @@ const modalCancelButton = document.getElementById("modalCancel");
 init();
 
 async function init() {
+  // モーダルを確実に非表示にしておく
+  modalOverlay.style.display = "none";
+
   // ログインチェック
   body.style.display = "none";
 
@@ -114,11 +117,15 @@ async function showEditSection() {
   if (firstId) {
     await fillEditForm(firstId);
   }
-  editSelect.addEventListener("change", () => {
-    if (editSelect.value) {
-      fillEditForm(editSelect.value);
-    }
-  }, { once: true });
+  editSelect.addEventListener(
+    "change",
+    () => {
+      if (editSelect.value) {
+        fillEditForm(editSelect.value);
+      }
+    },
+    { once: true }
+  );
 }
 
 async function showDeleteSection() {
@@ -272,7 +279,8 @@ function handleDeleteClick() {
   clearInlineMessage();
 
   const id = deleteSelect.value;
-  const title = deleteSelect.options[deleteSelect.selectedIndex]?.textContent || "";
+  const title =
+    deleteSelect.options[deleteSelect.selectedIndex]?.textContent || "";
 
   if (!id) {
     showInlineMessage("削除する投稿を選択してください");
@@ -284,13 +292,16 @@ function handleDeleteClick() {
   openModal(title);
 }
 
+// ==============================
+// モーダル制御（安定版）
+// ==============================
 function openModal(title) {
   modalTitle.textContent = title;
-  modalOverlay.hidden = false;
+  modalOverlay.style.display = "flex";
 }
 
 function closeModal() {
-  modalOverlay.hidden = true;
+  modalOverlay.style.display = "none";
   pendingDeleteId = null;
   pendingDeleteTitle = "";
 }
