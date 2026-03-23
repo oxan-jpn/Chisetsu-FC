@@ -9,7 +9,7 @@ document.body.style.display = "none";
 // セッション確認（復元を待つ）
 supabase.auth.getSession().then(({ data: { session } }) => {
   if (!session) {
-    window.location.href = "/pages/admin/login.html";
+    window.location.href = "/Chisetsu-FC/pages/admin/login.html";
   } else {
     // ログイン済み → 画面を表示
     document.body.style.display = "block";
@@ -19,21 +19,21 @@ supabase.auth.getSession().then(({ data: { session } }) => {
 // セッション変化（ログアウトなど）にも対応
 supabase.auth.onAuthStateChange((event, session) => {
   if (!session) {
-    window.location.href = "/pages/admin/login.html";
+    window.location.href = "/Chisetsu-FC/pages/admin/login.html";
   }
 });
 
 // ボタン遷移
 document.getElementById("newsBtn").addEventListener("click", () => {
-  window.location.href = "/pages/admin/news.html";
+  window.location.href = "/Chisetsu-FC/pages/admin/news.html";
 });
 
 document.getElementById("matchesBtn").addEventListener("click", () => {
-  window.location.href = "/pages/admin/matches.html";
+  window.location.href = "/Chisetsu-FC/pages/admin/matches.html";
 });
 
 // ログアウト
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await supabase.auth.signOut();
-  window.location.href = "/pages/admin/login.html";
+  window.location.href = "/Chisetsu-FC/pages/admin/login.html";
 });
