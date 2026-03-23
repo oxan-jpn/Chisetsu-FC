@@ -51,7 +51,7 @@ async function init() {
 
   const { data } = await supabaseClient.auth.getSession();
   if (!data.session) {
-    window.location.href = "/pages/admin/login.html";
+    window.location.href = "/Chisetsu-FC/pages/admin/login.html";
     return;
   }
 
