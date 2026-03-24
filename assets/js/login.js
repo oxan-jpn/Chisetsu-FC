@@ -16,6 +16,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   const errorBox = document.getElementById("error");
+  const loginBtn = document.getElementById("loginBtn");
 
   // 入力チェック
   if (!email || !password) {
@@ -23,17 +24,29 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
     return;
   }
 
+  // --- ログイン中 UI（多重クリック防止） ---
+  loginBtn.disabled = true;
+  loginBtn.classList.add("loading");
+  loginBtn.innerHTML = `<span class="spinner"></span> ログイン中...`;
+
   // ログイン実行
   const { data, error } = await client.auth.signInWithPassword({
     email,
     password
   });
 
+  // --- ログイン失敗 ---
   if (error) {
     errorBox.textContent = `ログインに失敗しました：${error.message}`;
+
+    // ボタンを元に戻す
+    loginBtn.disabled = false;
+    loginBtn.classList.remove("loading");
+    loginBtn.textContent = "ログイン";
+
     return;
   }
 
-  // ログイン成功
+  // --- ログイン成功 ---
   window.location.href = "/Chisetsu-FC/pages/admin/top.html";
 });
