@@ -7,6 +7,14 @@ const supabaseClient = supabase.createClient(
 );
 
 // ==============================
+// 空欄 → null 変換（共通関数）
+// ==============================
+function toNullable(value) {
+  const v = value.trim();
+  return v === "" ? null : v;
+}
+
+// ==============================
 // DOM 参照
 // ==============================
 const body = document.body;
@@ -46,26 +54,20 @@ const modalCancelButton = document.getElementById("modalCancel");
 init();
 
 async function init() {
-  // モーダルを確実に非表示にしておく
   modalOverlay.style.display = "none";
 
-  // ログインチェック
   body.style.display = "none";
-
   const { data } = await supabaseClient.auth.getSession();
   if (!data.session) {
     window.location.href = "/Chisetsu-FC/pages/admin/login.html";
     return;
   }
-
   body.style.display = "block";
 
-  // モード変更イベント
   modeRadios.forEach((radio) => {
     radio.addEventListener("change", handleModeChange);
   });
 
-  // ボタンイベント
   createSubmitButton.addEventListener("click", handleCreateSubmit);
   editSubmitButton.addEventListener("click", handleEditSubmit);
   deleteSubmitButton.addEventListener("click", handleDeleteClick);
@@ -73,7 +75,6 @@ async function init() {
   modalConfirmButton.addEventListener("click", handleModalConfirm);
   modalCancelButton.addEventListener("click", closeModal);
 
-  // 初期状態：何も選択されていない（フォーム非表示）
   hideAllSections();
 }
 
@@ -112,16 +113,16 @@ function showCreateSection() {
 async function showEditSection() {
   editSection.hidden = false;
   await populateSelect(editSelect);
+
   const firstId = editSelect.value;
   if (firstId) {
     await fillEditForm(firstId);
   }
+
   editSelect.addEventListener(
     "change",
     () => {
-      if (editSelect.value) {
-        fillEditForm(editSelect.value);
-      }
+      if (editSelect.value) fillEditForm(editSelect.value);
     },
     { once: true }
   );
@@ -173,9 +174,9 @@ async function handleCreateSubmit() {
   clearInlineMessage();
 
   const title = createTitleInput.value.trim();
-  const body = createBodyInput.value.trim();
-  const url = createUrlInput.value.trim();
-  const linkText = createLinkTextInput.value.trim();
+  const body = toNullable(createBodyInput.value);
+  const url = toNullable(createUrlInput.value);
+  const linkText = toNullable(createLinkTextInput.value);
 
   if (!title) {
     showInlineMessage("タイトルは必須です");
@@ -184,9 +185,9 @@ async function handleCreateSubmit() {
 
   const { error } = await supabaseClient.from("news").insert({
     title,
-    body: body || null,
-    url: url || null,
-    link_text: linkText || null,
+    body,
+    url,
+    link_text: linkText,
     is_deleted: false,
     published: true
   });
@@ -243,9 +244,9 @@ async function handleEditSubmit() {
   }
 
   const title = editTitleInput.value.trim();
-  const body = editBodyInput.value.trim();
-  const url = editUrlInput.value.trim();
-  const linkText = editLinkTextInput.value.trim();
+  const body = toNullable(editBodyInput.value);
+  const url = toNullable(editUrlInput.value);
+  const linkText = toNullable(editLinkTextInput.value);
 
   if (!title) {
     showInlineMessage("タイトルは必須です");
@@ -256,9 +257,9 @@ async function handleEditSubmit() {
     .from("news")
     .update({
       title,
-      body: body || null,
-      url: url || null,
-      link_text: linkText || null,
+      body,
+      url,
+      link_text: linkText,
       published: true
     })
     .eq("id", id)
@@ -298,7 +299,7 @@ function handleDeleteClick() {
 }
 
 // ==============================
-// モーダル制御（安定版）
+// モーダル制御
 // ==============================
 function openModal(title) {
   modalTitle.textContent = title;
