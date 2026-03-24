@@ -82,8 +82,7 @@ async function init() {
 // ==============================
 function handleModeChange() {
   const mode = getCurrentMode();
-  inlineMessage.textContent = "";
-
+  clearInlineMessage();
   hideAllSections();
 
   if (mode === "create") {
@@ -146,6 +145,7 @@ async function populateSelect(selectElement) {
     .order("id", { ascending: false });
 
   if (error) {
+    console.error(error);
     showInlineMessage("投稿一覧の取得に失敗しました");
     return;
   }
@@ -187,10 +187,12 @@ async function handleCreateSubmit() {
     body: body || null,
     url: url || null,
     link_text: linkText || null,
-    is_deleted: false
+    is_deleted: false,
+    published: true
   });
 
   if (error) {
+    console.error(error);
     showInlineMessage("投稿に失敗しました");
     return;
   }
@@ -220,6 +222,7 @@ async function fillEditForm(id) {
     .single();
 
   if (error || !data) {
+    console.error(error);
     showInlineMessage("投稿の取得に失敗しました");
     return;
   }
@@ -255,12 +258,14 @@ async function handleEditSubmit() {
       title,
       body: body || null,
       url: url || null,
-      link_text: linkText || null
+      link_text: linkText || null,
+      published: true
     })
     .eq("id", id)
     .or("is_deleted.is.null,is_deleted.eq.false");
 
   if (error) {
+    console.error(error);
     showInlineMessage("更新に失敗しました");
     return;
   }
@@ -321,11 +326,11 @@ async function handleModalConfirm() {
   closeModal();
 
   if (error) {
+    console.error(error);
     showInlineMessage("削除に失敗しました");
     return;
   }
 
-  // 新規投稿モードに戻す
   resetModeToCreate();
   showToast("削除しました");
 }
