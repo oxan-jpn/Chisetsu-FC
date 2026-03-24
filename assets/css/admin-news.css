@@ -101,6 +101,9 @@ button.secondary:hover {
   background: #cfcfcf;
 }
 
+/* ==============================
+   ラジオボタン（縦 1 列 3 段）
+   ============================== */
 .mode-fieldset {
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -114,15 +117,17 @@ button.secondary:hover {
 }
 
 .mode-fieldset label {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 16px;
-  margin-top: 4px;
+  display: block;          /* ← 縦並びにする */
+  margin: 6px 0;           /* ← 適度な余白 */
+  font-size: 15px;
+  cursor: pointer;
 }
 
 .mode-fieldset input[type="radio"] {
-  margin-right: 4px;
+  margin-right: 6px;
 }
+
+/* ============================== */
 
 .form-section {
   margin-top: 16px;
