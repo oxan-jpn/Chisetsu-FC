@@ -117,8 +117,10 @@ button.secondary:hover {
 }
 
 .mode-fieldset label {
-  display: block;          /* ← 縦並びにする */
-  margin: 6px 0;           /* ← 適度な余白 */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0;
   font-size: 15px;
   cursor: pointer;
 }
