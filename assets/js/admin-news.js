@@ -7,7 +7,7 @@ const supabaseClient = supabase.createClient(
 );
 
 // ==============================
-// 空欄 → null 変換（共通関数）
+// 空欄 → null 変換
 // ==============================
 function toNullable(value) {
   const v = value.trim();
@@ -119,13 +119,10 @@ async function showEditSection() {
     await fillEditForm(firstId);
   }
 
-  editSelect.addEventListener(
-    "change",
-    () => {
-      if (editSelect.value) fillEditForm(editSelect.value);
-    },
-    { once: true }
-  );
+  // ← 修正：毎回 change を拾う
+  editSelect.addEventListener("change", () => {
+    if (editSelect.value) fillEditForm(editSelect.value);
+  });
 }
 
 async function showDeleteSection() {
