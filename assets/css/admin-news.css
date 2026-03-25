@@ -126,7 +126,11 @@ button.secondary:hover {
 }
 
 .mode-fieldset input[type="radio"] {
+  width: auto;
+  margin: 0;
   margin-right: 6px;
+  padding: 0;
+  border: none;
 }
 
 /* ============================== */
