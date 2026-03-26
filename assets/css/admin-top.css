@@ -1,7 +1,7 @@
 body {
   font-family: sans-serif;
   background: #f7f9fc;
-  margin: 0;
+  margin: 120px;
   padding: 0;
   display: flex;
   justify-content: center;
@@ -10,7 +10,7 @@ body {
 }
 
 .container {
-  width: 90%;
+  width: 80%;
   max-width: 360px;
   background: #fff;
   padding: 24px;
