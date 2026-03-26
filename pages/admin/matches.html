@@ -23,59 +23,49 @@
     <!-- モード選択 -->
     <fieldset class="mode-fieldset">
       <legend>操作を選択</legend>
+
       <label>
         <input type="radio" name="mode" value="create">
-        新規登録
+        試合予定入力
       </label>
+
       <label>
         <input type="radio" name="mode" value="edit">
-        試合修正
+        試合予定修正
       </label>
+
       <label>
-        <input type="radio" name="mode" value="delete">
-        試合削除
+        <input type="radio" name="mode" value="result">
+        試合結果入力
       </label>
     </fieldset>
 
-    <!-- 新規登録 -->
+    <!-- ============================
+         ① 試合予定入力（新規）
+    ============================= -->
     <section id="createSection" class="form-section" hidden>
-      <h3>新規登録</h3>
+      <h3>試合予定入力</h3>
 
       <label for="createDate">試合日（必須）</label>
       <input id="createDate" type="date">
 
-      <label for="createKickoff">キックオフ（任意）</label>
+      <label for="createKickoff">キックオフ（必須）</label>
       <input id="createKickoff" type="time">
 
       <label for="createOpponent">対戦相手（必須）</label>
       <select id="createOpponent"></select>
 
-      <label for="createLocation">会場（任意）</label>
+      <label for="createLocation">会場（必須）</label>
       <input id="createLocation" type="text">
-
-      <label for="createScoreFor">得点（自チーム）</label>
-      <input id="createScoreFor" type="number" min="0">
-
-      <label for="createScoreAgainst">失点（相手）</label>
-      <input id="createScoreAgainst" type="number" min="0">
-
-      <label for="createResult">結果</label>
-      <select id="createResult">
-        <option value="">選択してください</option>
-        <option value="win">勝ち</option>
-        <option value="draw">引き分け</option>
-        <option value="lose">負け</option>
-      </select>
-
-      <label for="createNote">メモ（任意）</label>
-      <textarea id="createNote"></textarea>
 
       <button id="createSubmit" type="button">登録する</button>
     </section>
 
-    <!-- 修正 -->
+    <!-- ============================
+         ② 試合予定修正
+    ============================= -->
     <section id="editSection" class="form-section" hidden>
-      <h3>試合修正</h3>
+      <h3>試合予定修正</h3>
 
       <label for="editSelect">修正する試合を選択</label>
       <select id="editSelect"></select>
@@ -83,56 +73,54 @@
       <label for="editDate">試合日（必須）</label>
       <input id="editDate" type="date">
 
-      <label for="editKickoff">キックオフ（任意）</label>
+      <label for="editKickoff">キックオフ（必須）</label>
       <input id="editKickoff" type="time">
 
       <label for="editOpponent">対戦相手（必須）</label>
       <select id="editOpponent"></select>
 
-      <label for="editLocation">会場（任意）</label>
+      <label for="editLocation">会場（必須）</label>
       <input id="editLocation" type="text">
 
-      <label for="editScoreFor">得点（自チーム）</label>
-      <input id="editScoreFor" type="number" min="0">
+      <button id="editSubmit" type="button">更新する</button>
+    </section>
 
-      <label for="editScoreAgainst">失点（相手）</label>
-      <input id="editScoreAgainst" type="number" min="0">
+    <!-- ============================
+         ③ 試合結果入力（新規）
+    ============================= -->
+    <section id="resultSection" class="form-section" hidden>
+      <h3>試合結果入力</h3>
 
-      <label for="editResult">結果</label>
-      <select id="editResult">
+      <label for="resultSelect">結果を入力する試合を選択</label>
+      <select id="resultSelect"></select>
+
+      <label for="resultScoreFor">得点（必須）</label>
+      <input id="resultScoreFor" type="number" min="0">
+
+      <label for="resultScoreAgainst">失点（必須）</label>
+      <input id="resultScoreAgainst" type="number" min="0">
+
+      <label for="resultResult">結果（必須）</label>
+      <select id="resultResult">
         <option value="">選択してください</option>
         <option value="win">勝ち</option>
         <option value="draw">引き分け</option>
         <option value="lose">負け</option>
       </select>
 
-      <label for="editNote">メモ（任意）</label>
-      <textarea id="editNote"></textarea>
-
-      <button id="editSubmit" type="button">更新する</button>
-    </section>
-
-    <!-- 削除 -->
-    <section id="deleteSection" class="form-section" hidden>
-      <h3>試合削除</h3>
-
-      <label for="deleteSelect">削除する試合を選択</label>
-      <select id="deleteSelect"></select>
-
-      <button id="deleteSubmit" type="button" class="danger">削除する</button>
+      <button id="resultSubmit" type="button">結果を登録する</button>
     </section>
 
     <p id="inlineMessage" class="inline-message" aria-live="polite"></p>
   </div>
 
-  <!-- 削除確認モーダル -->
+  <!-- モーダル（削除は今回使わないが構造は残す） -->
   <div id="modalOverlay" class="modal-overlay">
     <div class="modal">
-      <h3>試合の削除</h3>
+      <h3>確認</h3>
       <p id="modalTitle" class="modal-title"></p>
-      <p>本当に削除しますか？</p>
       <div class="modal-actions">
-        <button id="modalConfirm" type="button" class="danger">削除する</button>
+        <button id="modalConfirm" type="button" class="danger">OK</button>
         <button id="modalCancel" type="button" class="secondary">キャンセル</button>
       </div>
     </div>
