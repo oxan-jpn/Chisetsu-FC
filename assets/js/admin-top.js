@@ -32,8 +32,29 @@ document.getElementById("matchesBtn").addEventListener("click", () => {
   window.location.href = "/Chisetsu-FC/pages/admin/matches.html";
 });
 
-// ログアウト
+// ==============================
+// ログアウト（ぐるぐる付き）
+// ==============================
 document.getElementById("logoutBtn").addEventListener("click", async () => {
-  await client.auth.signOut();
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  // 多重クリック防止 + ローディング表示
+  logoutBtn.disabled = true;
+  logoutBtn.classList.add("loading");
+  logoutBtn.innerHTML = `<span class="spinner"></span> ログアウト中…`;
+
+  const { error } = await client.auth.signOut();
+
+  if (error) {
+    // エラー時は元に戻す
+    logoutBtn.disabled = false;
+    logoutBtn.classList.remove("loading");
+    logoutBtn.textContent = "ログアウト";
+    console.error(error);
+    alert("ログアウトに失敗しました");
+    return;
+  }
+
+  // 成功 → ログイン画面へ
   window.location.href = "/Chisetsu-FC/pages/admin/login.html";
 });
