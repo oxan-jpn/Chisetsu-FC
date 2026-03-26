@@ -16,35 +16,34 @@ const yearSelect = document.getElementById("yearSelect");
 const modeRadios = document.querySelectorAll("input[name='mode']");
 const createSection = document.getElementById("createSection");
 const editSection = document.getElementById("editSection");
-const deleteSection = document.getElementById("deleteSection");
+const resultSection = document.getElementById("resultSection");
 
+const inlineMessage = document.getElementById("inlineMessage");
+const toast = document.getElementById("toast");
+
+// --- 予定入力 ---
 const createDateInput = document.getElementById("createDate");
 const createKickoffInput = document.getElementById("createKickoff");
 const createOpponentSelect = document.getElementById("createOpponent");
 const createLocationInput = document.getElementById("createLocation");
-const createScoreForInput = document.getElementById("createScoreFor");
-const createScoreAgainstInput = document.getElementById("createScoreAgainst");
-const createResultSelect = document.getElementById("createResult");
-const createNoteInput = document.getElementById("createNote");
 const createSubmitButton = document.getElementById("createSubmit");
 
+// --- 予定修正 ---
 const editSelect = document.getElementById("editSelect");
 const editDateInput = document.getElementById("editDate");
 const editKickoffInput = document.getElementById("editKickoff");
 const editOpponentSelect = document.getElementById("editOpponent");
 const editLocationInput = document.getElementById("editLocation");
-const editScoreForInput = document.getElementById("editScoreFor");
-const editScoreAgainstInput = document.getElementById("editScoreAgainst");
-const editResultSelect = document.getElementById("editResult");
-const editNoteInput = document.getElementById("editNote");
 const editSubmitButton = document.getElementById("editSubmit");
 
-const deleteSelect = document.getElementById("deleteSelect");
-const deleteSubmitButton = document.getElementById("deleteSubmit");
+// --- 結果入力 ---
+const resultSelect = document.getElementById("resultSelect");
+const resultScoreForInput = document.getElementById("resultScoreFor");
+const resultScoreAgainstInput = document.getElementById("resultScoreAgainst");
+const resultResultSelect = document.getElementById("resultResult");
+const resultSubmitButton = document.getElementById("resultSubmit");
 
-const inlineMessage = document.getElementById("inlineMessage");
-const toast = document.getElementById("toast");
-
+// --- モーダル（必要最低限） ---
 const modalOverlay = document.getElementById("modalOverlay");
 const modalTitle = document.getElementById("modalTitle");
 const modalConfirmButton = document.getElementById("modalConfirm");
@@ -54,7 +53,7 @@ const modalCancelButton = document.getElementById("modalCancel");
 // 状態
 // ==============================
 let allMatches = [];
-let pendingDeleteId = null;
+let pendingAction = null;
 
 // ==============================
 // 初期化
@@ -64,6 +63,7 @@ init();
 async function init() {
   modalOverlay.style.display = "none";
 
+  // 認証チェック
   body.style.display = "none";
   const { data } = await supabaseClient.auth.getSession();
   if (!data.session) {
@@ -78,11 +78,15 @@ async function init() {
   // 年度セレクト生成
   populateYearSelect();
 
-  // 初期年度の opponent セレクト生成
+  // 初期年度の予定一覧・対戦相手一覧を生成
   updateOpponentSelects();
+  updateMatchSelects();
 
   // イベント登録
-  yearSelect.addEventListener("change", updateOpponentSelects);
+  yearSelect.addEventListener("change", () => {
+    updateOpponentSelects();
+    updateMatchSelects();
+  });
 
   modeRadios.forEach((radio) => {
     radio.addEventListener("change", handleModeChange);
@@ -90,7 +94,7 @@ async function init() {
 
   createSubmitButton.addEventListener("click", handleCreateSubmit);
   editSubmitButton.addEventListener("click", handleEditSubmit);
-  deleteSubmitButton.addEventListener("click", handleDeleteClick);
+  resultSubmitButton.addEventListener("click", handleResultSubmit);
 
   modalConfirmButton.addEventListener("click", handleModalConfirm);
   modalCancelButton.addEventListener("click", closeModal);
@@ -105,7 +109,7 @@ async function loadAllMatches() {
   const { data, error } = await supabaseClient
     .from("matches")
     .select("*")
-    .order("date", { ascending: false });
+    .order("date", { ascending: true });
 
   if (error) {
     console.error(error);
@@ -133,7 +137,7 @@ function populateYearSelect() {
 }
 
 // ==============================
-// opponent セレクト更新
+// 対戦相手セレクト（予定入力・予定修正）
 // ==============================
 function updateOpponentSelects() {
   const selectedYear = yearSelect.value;
@@ -158,20 +162,17 @@ function updateOpponentSelects() {
     opt.textContent = name;
     editOpponentSelect.appendChild(opt);
   });
-
-  // delete / edit の試合一覧も年度で更新
-  populateMatchSelects();
 }
 
 // ==============================
-// 試合一覧セレクト（edit / delete）
+// 試合一覧セレクト（予定修正・結果入力）
 // ==============================
-function populateMatchSelects() {
+function updateMatchSelects() {
   const selectedYear = yearSelect.value;
 
   const filtered = allMatches.filter(m => m.date.startsWith(selectedYear));
 
-  // edit
+  // 予定修正
   editSelect.innerHTML = "";
   filtered.forEach(m => {
     const opt = document.createElement("option");
@@ -180,16 +181,16 @@ function populateMatchSelects() {
     editSelect.appendChild(opt);
   });
 
-  // delete
-  deleteSelect.innerHTML = "";
+  // 結果入力
+  resultSelect.innerHTML = "";
   filtered.forEach(m => {
     const opt = document.createElement("option");
     opt.value = m.id;
     opt.textContent = `${m.date} / ${m.opponent}`;
-    deleteSelect.appendChild(opt);
+    resultSelect.appendChild(opt);
   });
 
-  // 初期選択の試合をフォームに反映
+  // 修正フォーム初期値
   if (editSelect.value) fillEditForm(editSelect.value);
   editSelect.addEventListener("change", () => {
     if (editSelect.value) fillEditForm(editSelect.value);
@@ -208,8 +209,8 @@ function handleModeChange() {
     createSection.hidden = false;
   } else if (mode === "edit") {
     editSection.hidden = false;
-  } else if (mode === "delete") {
-    deleteSection.hidden = false;
+  } else if (mode === "result") {
+    resultSection.hidden = false;
   }
 }
 
@@ -221,32 +222,33 @@ function getCurrentMode() {
 function hideAllSections() {
   createSection.hidden = true;
   editSection.hidden = true;
-  deleteSection.hidden = true;
+  resultSection.hidden = true;
 }
 
 // ==============================
-// 新規登録
+// ① 試合予定入力（新規）
 // ==============================
 async function handleCreateSubmit() {
   clearInlineMessage();
 
   const date = createDateInput.value;
+  const kickoff = createKickoffInput.value;
   const opponent = createOpponentSelect.value;
+  const location = createLocationInput.value;
 
-  if (!date || !opponent) {
+  if (!date || !kickoff || !opponent || !location) {
     showInlineMessage("必須項目が未入力です");
     return;
   }
 
   const payload = {
     date,
-    kickoff: createKickoffInput.value || null,
+    kickoff,
     opponent,
-    location: createLocationInput.value || null,
-    score_for: createScoreForInput.value ? Number(createScoreForInput.value) : null,
-    score_against: createScoreAgainstInput.value ? Number(createScoreAgainstInput.value) : null,
-    result: createResultSelect.value || null,
-    note: createNoteInput.value || null
+    location,
+    score_for: null,
+    score_against: null,
+    result: null
   };
 
   const { error } = await supabaseClient.from("matches").insert(payload);
@@ -257,27 +259,21 @@ async function handleCreateSubmit() {
     return;
   }
 
-  showToast("登録しました");
-  resetCreateForm();
+  showToast("試合予定を登録しました");
 
-  await loadAllMatches();
-  updateOpponentSelects();
-}
-
-function resetCreateForm() {
   createDateInput.value = "";
   createKickoffInput.value = "";
   createLocationInput.value = "";
-  createScoreForInput.value = "";
-  createScoreAgainstInput.value = "";
-  createResultSelect.value = "";
-  createNoteInput.value = "";
+
+  await loadAllMatches();
+  updateOpponentSelects();
+  updateMatchSelects();
 }
 
 // ==============================
-// 修正
+// ② 試合予定修正
 // ==============================
-async function fillEditForm(id) {
+function fillEditForm(id) {
   clearInlineMessage();
 
   const match = allMatches.find(m => m.id == id);
@@ -287,10 +283,6 @@ async function fillEditForm(id) {
   editKickoffInput.value = match.kickoff || "";
   editOpponentSelect.value = match.opponent;
   editLocationInput.value = match.location || "";
-  editScoreForInput.value = match.score_for ?? "";
-  editScoreAgainstInput.value = match.score_against ?? "";
-  editResultSelect.value = match.result || "";
-  editNoteInput.value = match.note || "";
 }
 
 async function handleEditSubmit() {
@@ -302,16 +294,17 @@ async function handleEditSubmit() {
     return;
   }
 
-  const payload = {
-    date: editDateInput.value,
-    kickoff: editKickoffInput.value || null,
-    opponent: editOpponentSelect.value,
-    location: editLocationInput.value || null,
-    score_for: editScoreForInput.value ? Number(editScoreForInput.value) : null,
-    score_against: editScoreAgainstInput.value ? Number(editScoreAgainstInput.value) : null,
-    result: editResultSelect.value || null,
-    note: editNoteInput.value || null
-  };
+  const date = editDateInput.value;
+  const kickoff = editKickoffInput.value;
+  const opponent = editOpponentSelect.value;
+  const location = editLocationInput.value;
+
+  if (!date || !kickoff || !opponent || !location) {
+    showInlineMessage("必須項目が未入力です");
+    return;
+  }
+
+  const payload = { date, kickoff, opponent, location };
 
   const { error } = await supabaseClient
     .from("matches")
@@ -324,60 +317,66 @@ async function handleEditSubmit() {
     return;
   }
 
-  showToast("更新しました");
+  showToast("試合予定を更新しました");
 
   await loadAllMatches();
   updateOpponentSelects();
+  updateMatchSelects();
 }
 
 // ==============================
-// 削除
+// ③ 試合結果入力（新規）
 // ==============================
-function handleDeleteClick() {
+async function handleResultSubmit() {
   clearInlineMessage();
 
-  const id = deleteSelect.value;
-  if (!id) {
-    showInlineMessage("削除する試合を選択してください");
+  const id = resultSelect.value;
+  const scoreFor = resultScoreForInput.value;
+  const scoreAgainst = resultScoreAgainstInput.value;
+  const result = resultResultSelect.value;
+
+  if (!id || scoreFor === "" || scoreAgainst === "" || !result) {
+    showInlineMessage("必須項目が未入力です");
     return;
   }
 
-  pendingDeleteId = id;
-
-  const match = allMatches.find(m => m.id == id);
-  modalTitle.textContent = `${match.date} / ${match.opponent}`;
-
-  modalOverlay.style.display = "flex";
-}
-
-function closeModal() {
-  modalOverlay.style.display = "none";
-  pendingDeleteId = null;
-}
-
-async function handleModalConfirm() {
-  if (!pendingDeleteId) {
-    closeModal();
-    return;
-  }
+  const payload = {
+    score_for: Number(scoreFor),
+    score_against: Number(scoreAgainst),
+    result
+  };
 
   const { error } = await supabaseClient
     .from("matches")
-    .delete()
-    .eq("id", pendingDeleteId);
-
-  closeModal();
+    .update(payload)
+    .eq("id", id);
 
   if (error) {
     console.error(error);
-    showInlineMessage("削除に失敗しました");
+    showInlineMessage("結果の登録に失敗しました");
     return;
   }
 
-  showToast("削除しました");
+  showToast("試合結果を登録しました");
+
+  resultScoreForInput.value = "";
+  resultScoreAgainstInput.value = "";
+  resultResultSelect.value = "";
 
   await loadAllMatches();
-  updateOpponentSelects();
+  updateMatchSelects();
+}
+
+// ==============================
+// モーダル（必要最低限）
+// ==============================
+function closeModal() {
+  modalOverlay.style.display = "none";
+  pendingAction = null;
+}
+
+function handleModalConfirm() {
+  closeModal();
 }
 
 // ==============================
