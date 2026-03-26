@@ -24,7 +24,7 @@ const toast = document.getElementById("toast");
 // --- 予定入力 ---
 const createDateInput = document.getElementById("createDate");
 const createKickoffInput = document.getElementById("createKickoff");
-const createOpponentSelect = document.getElementById("createOpponent");
+const createOpponentInput = document.getElementById("createOpponent");
 const createLocationInput = document.getElementById("createLocation");
 const createSubmitButton = document.getElementById("createSubmit");
 
@@ -32,7 +32,7 @@ const createSubmitButton = document.getElementById("createSubmit");
 const editSelect = document.getElementById("editSelect");
 const editDateInput = document.getElementById("editDate");
 const editKickoffInput = document.getElementById("editKickoff");
-const editOpponentSelect = document.getElementById("editOpponent");
+const editOpponentInput = document.getElementById("editOpponent");
 const editLocationInput = document.getElementById("editLocation");
 const editSubmitButton = document.getElementById("editSubmit");
 
@@ -43,7 +43,7 @@ const resultScoreAgainstInput = document.getElementById("resultScoreAgainst");
 const resultResultSelect = document.getElementById("resultResult");
 const resultSubmitButton = document.getElementById("resultSubmit");
 
-// --- モーダル（必要最低限） ---
+// --- モーダル ---
 const modalOverlay = document.getElementById("modalOverlay");
 const modalTitle = document.getElementById("modalTitle");
 const modalConfirmButton = document.getElementById("modalConfirm");
@@ -78,15 +78,11 @@ async function init() {
   // 年度セレクト生成
   populateYearSelect();
 
-  // 初期年度の予定一覧・対戦相手一覧を生成
-  updateOpponentSelects();
+  // 初期年度の予定一覧を生成
   updateMatchSelects();
 
   // イベント登録
-  yearSelect.addEventListener("change", () => {
-    updateOpponentSelects();
-    updateMatchSelects();
-  });
+  yearSelect.addEventListener("change", updateMatchSelects);
 
   modeRadios.forEach((radio) => {
     radio.addEventListener("change", handleModeChange);
@@ -133,34 +129,6 @@ function populateYearSelect() {
     opt.value = year;
     opt.textContent = `${year}年度`;
     yearSelect.appendChild(opt);
-  });
-}
-
-// ==============================
-// 対戦相手セレクト（予定入力・予定修正）
-// ==============================
-function updateOpponentSelects() {
-  const selectedYear = yearSelect.value;
-
-  const filtered = allMatches.filter(m => m.date.startsWith(selectedYear));
-  const uniqueOpponents = [...new Set(filtered.map(m => m.opponent))];
-
-  // create
-  createOpponentSelect.innerHTML = "";
-  uniqueOpponents.forEach(name => {
-    const opt = document.createElement("option");
-    opt.value = name;
-    opt.textContent = name;
-    createOpponentSelect.appendChild(opt);
-  });
-
-  // edit
-  editOpponentSelect.innerHTML = "";
-  uniqueOpponents.forEach(name => {
-    const opt = document.createElement("option");
-    opt.value = name;
-    opt.textContent = name;
-    editOpponentSelect.appendChild(opt);
   });
 }
 
@@ -233,8 +201,8 @@ async function handleCreateSubmit() {
 
   const date = createDateInput.value;
   const kickoff = createKickoffInput.value;
-  const opponent = createOpponentSelect.value;
-  const location = createLocationInput.value;
+  const opponent = createOpponentInput.value.trim();
+  const location = createLocationInput.value.trim();
 
   if (!date || !kickoff || !opponent || !location) {
     showInlineMessage("必須項目が未入力です");
@@ -263,10 +231,10 @@ async function handleCreateSubmit() {
 
   createDateInput.value = "";
   createKickoffInput.value = "";
+  createOpponentInput.value = "";
   createLocationInput.value = "";
 
   await loadAllMatches();
-  updateOpponentSelects();
   updateMatchSelects();
 }
 
@@ -281,7 +249,7 @@ function fillEditForm(id) {
 
   editDateInput.value = match.date;
   editKickoffInput.value = match.kickoff || "";
-  editOpponentSelect.value = match.opponent;
+  editOpponentInput.value = match.opponent;
   editLocationInput.value = match.location || "";
 }
 
@@ -296,8 +264,8 @@ async function handleEditSubmit() {
 
   const date = editDateInput.value;
   const kickoff = editKickoffInput.value;
-  const opponent = editOpponentSelect.value;
-  const location = editLocationInput.value;
+  const opponent = editOpponentInput.value.trim();
+  const location = editLocationInput.value.trim();
 
   if (!date || !kickoff || !opponent || !location) {
     showInlineMessage("必須項目が未入力です");
@@ -320,7 +288,6 @@ async function handleEditSubmit() {
   showToast("試合予定を更新しました");
 
   await loadAllMatches();
-  updateOpponentSelects();
   updateMatchSelects();
 }
 
