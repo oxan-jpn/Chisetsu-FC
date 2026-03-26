@@ -204,3 +204,36 @@ button.secondary:hover {
   width: 50%;
   margin-top: 0;
 }
+
+/* ==============================
+   戻るボタン（左上・左下）
+============================== */
+.back-button {
+  display: inline-block;
+  padding: 10px 14px;
+  background: #eee;
+  color: #333;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.back-button:hover {
+  background: #ddd;
+}
+
+/* 左上固定 */
+.back-button.top {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 2000;
+}
+
+/* 左下（ページ末尾） */
+.back-button.bottom {
+  margin-top: 40px;
+  display: inline-block;
+}
