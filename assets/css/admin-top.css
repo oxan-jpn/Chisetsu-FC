@@ -1,13 +1,16 @@
 body {
   font-family: sans-serif;
   background: #f7f9fc;
-  margin: 120px 0 0 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
+  margin: 0;
   padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  height: auto;
+  -webkit-box-align: center;
+  -webkit-box-pack: center;
 }
 
 .container {
@@ -18,7 +21,9 @@ body {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   text-align: center;
+  margin: 120px 0 0 0;
 }
+
 
 h2 {
   color: #1E88E5;
