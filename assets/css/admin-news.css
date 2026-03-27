@@ -209,10 +209,10 @@ button.secondary:hover {
    戻るボタン（左上・左下）
 ============================== */
 .back-button {
-  width: 80%;
+  width: 100%;
   display: inline-block;
   padding: 10px 14px;
-  margin: 40px auto;
+  margin-top: 40px;
   background: #eee;
   color: #333;
   text-decoration: none;
