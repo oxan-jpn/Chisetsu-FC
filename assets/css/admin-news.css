@@ -209,8 +209,10 @@ button.secondary:hover {
    戻るボタン（左上・左下）
 ============================== */
 .back-button {
+  width: 80%;
   display: inline-block;
   padding: 10px 14px;
+  margin-top: 40px;
   background: #eee;
   color: #333;
   text-decoration: none;
@@ -218,22 +220,9 @@ button.secondary:hover {
   font-size: 15px;
   font-weight: 500;
   transition: background 0.2s;
+  text-align: center;
 }
 
 .back-button:hover {
   background: #ddd;
-}
-
-/* 左上固定 */
-.back-button.top {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  z-index: 2000;
-}
-
-/* 左下（ページ末尾） */
-.back-button.bottom {
-  margin-top: 40px;
-  display: inline-block;
 }
