@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>{{title}}</title>
+
+  <!-- SNS 共有用（任意） -->
+  <meta property="og:title" content="{{title}}">
+  <meta property="og:description" content="{{body_summary}}">
+  {{#if image_url}}
+    <meta property="og:image" content="{{image_url}}">
+  {{/if}}
+
+  <link rel="stylesheet" href="./news-detail.css">
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- タイトル（左寄せ） -->
+    <div class="title">{{title}}</div>
+
+    <!-- 日付（右寄せ） -->
+    <div class="date">{{date}}</div>
+
+    <!-- 画像（null の場合は GitHub Actions 側で削除） -->
+    {{#if image_url}}
+      <img src="{{image_url}}" alt="" class="news-image">
+    {{/if}}
+
+    <!-- 本文 -->
+    <div class="body">
+      {{body}}
+    </div>
+
+    <!-- 戻るボタン -->
+    <a href="/Chisetsu-FC/pages/news/index.html" class="back-button">← お知らせ一覧へ戻る</a>
+
+  </div>
+
+</body>
+</html>
