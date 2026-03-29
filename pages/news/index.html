@@ -1,1 +1,40 @@
-aaa
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>お知らせ一覧</title>
+
+  <link rel="stylesheet" href="./news-list.css">
+</head>
+<body>
+
+  <div class="container">
+
+    <h1 class="page-title">お知らせ一覧</h1>
+
+    <div class="news-list">
+
+      {{#each news}}
+      <a href="./{{page_name}}.html" class="news-card">
+
+        {{#if image_url}}
+          <img src="{{image_url}}" alt="" class="thumb">
+        {{/if}}
+
+        <div class="info">
+          <div class="title">{{title}}</div>
+          <div class="date">{{date}}</div>
+          <div class="summary">{{summary}}</div>
+        </div>
+
+      </a>
+      {{/each}}
+
+    </div>
+
+  </div>
+
+</body>
+</html>
