@@ -6,11 +6,6 @@ body {
   height: auto;
   margin: 0;
   padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  -webkit-box-align: center;
-  -webkit-box-pack: center;
 }
 
 .container {
@@ -21,7 +16,7 @@ body {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   text-align: center;
-  margin: 120px 0 0 0;
+  margin: 120px auto 0;
 }
 
 
