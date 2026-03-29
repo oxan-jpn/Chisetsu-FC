@@ -28,6 +28,7 @@ const createTitleInput = document.getElementById("createTitle");
 const createBodyInput = document.getElementById("createBody");
 const createUrlInput = document.getElementById("createUrl");
 const createLinkTextInput = document.getElementById("createLinkText");
+const createImageInput = document.getElementById("createImage");
 const createSubmitButton = document.getElementById("createSubmit");
 
 const editSelect = document.getElementById("editSelect");
@@ -35,6 +36,7 @@ const editTitleInput = document.getElementById("editTitle");
 const editBodyInput = document.getElementById("editBody");
 const editUrlInput = document.getElementById("editUrl");
 const editLinkTextInput = document.getElementById("editLinkText");
+const editImageInput = document.getElementById("editImage");
 const editSubmitButton = document.getElementById("editSubmit");
 
 const deleteSelect = document.getElementById("deleteSelect");
@@ -119,7 +121,6 @@ async function showEditSection() {
     await fillEditForm(firstId);
   }
 
-  // ← 修正：毎回 change を拾う
   editSelect.addEventListener("change", () => {
     if (editSelect.value) fillEditForm(editSelect.value);
   });
@@ -165,7 +166,7 @@ async function populateSelect(selectElement) {
 }
 
 // ==============================
-// 新規投稿
+// 新規投稿（画像アップロード対応）
 // ==============================
 async function handleCreateSubmit() {
   clearInlineMessage();
@@ -174,10 +175,34 @@ async function handleCreateSubmit() {
   const body = toNullable(createBodyInput.value);
   const url = toNullable(createUrlInput.value);
   const linkText = toNullable(createLinkTextInput.value);
+  const file = createImageInput.files[0];
 
   if (!title) {
     showInlineMessage("タイトルは必須です");
     return;
+  }
+
+  let imageUrl = null;
+
+  // 画像アップロード
+  if (file) {
+    const filePath = `news/${Date.now()}_${file.name}`;
+
+    const { error: uploadError } = await supabaseClient.storage
+      .from("news-images")
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error(uploadError);
+      showInlineMessage("画像のアップロードに失敗しました");
+      return;
+    }
+
+    const { data: urlData } = supabaseClient.storage
+      .from("news-images")
+      .getPublicUrl(filePath);
+
+    imageUrl = urlData.publicUrl;
   }
 
   const { error } = await supabaseClient.from("news").insert({
@@ -185,6 +210,7 @@ async function handleCreateSubmit() {
     body,
     url,
     link_text: linkText,
+    image_url: imageUrl,
     is_deleted: false,
     published: true
   });
@@ -204,10 +230,11 @@ function resetCreateForm() {
   createBodyInput.value = "";
   createUrlInput.value = "";
   createLinkTextInput.value = "";
+  createImageInput.value = "";
 }
 
 // ==============================
-// 投稿修正
+// 投稿修正（画像再アップロード対応）
 // ==============================
 async function fillEditForm(id) {
   clearInlineMessage();
@@ -229,6 +256,8 @@ async function fillEditForm(id) {
   editBodyInput.value = data.body || "";
   editUrlInput.value = data.url || "";
   editLinkTextInput.value = data.link_text || "";
+  editImageInput.value = "";
+  editImageInput.dataset.currentImage = data.image_url || "";
 }
 
 async function handleEditSubmit() {
@@ -244,10 +273,34 @@ async function handleEditSubmit() {
   const body = toNullable(editBodyInput.value);
   const url = toNullable(editUrlInput.value);
   const linkText = toNullable(editLinkTextInput.value);
+  const file = editImageInput.files[0];
 
   if (!title) {
     showInlineMessage("タイトルは必須です");
     return;
+  }
+
+  let imageUrl = editImageInput.dataset.currentImage || null;
+
+  // 新しい画像が選ばれた場合のみアップロード
+  if (file) {
+    const filePath = `news/${Date.now()}_${file.name}`;
+
+    const { error: uploadError } = await supabaseClient.storage
+      .from("news-images")
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error(uploadError);
+      showInlineMessage("画像のアップロードに失敗しました");
+      return;
+    }
+
+    const { data: urlData } = supabaseClient.storage
+      .from("news-images")
+      .getPublicUrl(filePath);
+
+    imageUrl = urlData.publicUrl;
   }
 
   const { error } = await supabaseClient
@@ -257,6 +310,7 @@ async function handleEditSubmit() {
       body,
       url,
       link_text: linkText,
+      image_url: imageUrl,
       published: true
     })
     .eq("id", id)
