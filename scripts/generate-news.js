@@ -1,154 +1,77 @@
-// scripts/generate-news.js
-
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { createClient } from "@supabase/supabase-js";
 
-// ------------------------------
-// パス関連
-// ------------------------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const NEWS_DIR = path.join(__dirname, "../pages/news");
-const TEMPLATE_DETAIL = path.join(NEWS_DIR, "template.html");
-const TEMPLATE_INDEX = path.join(NEWS_DIR, "index-template.html");
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-// ------------------------------
-// Supabase クライアント
-// ------------------------------
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+async function fetchNews() {
+  const url = `${SUPABASE_URL}/rest/v1/news?select=*`;
 
-// ------------------------------
-// 日付フォーマット
-// ------------------------------
-function formatDate(dateStr) {
-  const d = new Date(dateStr);
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}/${mm}/${dd}`;
-}
+  const res = await fetch(url, {
+    headers: {
+      apikey: SERVICE_KEY,
+      Authorization: `Bearer ${SERVICE_KEY}`,
+    },
+  });
 
-// HTML エスケープ（最低限）
-function escapeHtml(str) {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-// ------------------------------
-// 本文の summary（冒頭80文字）
-// ------------------------------
-function createSummary(body) {
-  if (!body) return "";
-  return body.length > 80 ? body.slice(0, 80) + "…" : body;
-}
-
-// ------------------------------
-// 詳細ページ生成
-// ------------------------------
-function generateDetailPage(template, item) {
-  let html = template;
-
-  html = html.replace(/{{title}}/g, escapeHtml(item.title));
-  html = html.replace(/{{date}}/g, formatDate(item.created_at));
-  html = html.replace(/{{body}}/g, escapeHtml(item.body || ""));
-  html = html.replace(/{{body_summary}}/g, escapeHtml(createSummary(item.body)));
-
-  if (item.image_url) {
-    html = html.replace(/{{#if image_url}}([\s\S]*?){{\/if}}/g, `$1`);
-    html = html.replace(/{{image_url}}/g, item.image_url);
-  } else {
-    html = html.replace(/{{#if image_url}}([\s\S]*?){{\/if}}/g, "");
+  if (!res.ok) {
+    throw new Error(`Failed to fetch news: ${res.status} ${res.statusText}`);
   }
 
-  return html;
+  return await res.json();
 }
 
-// ------------------------------
-// 一覧ページ生成
-// ------------------------------
-function generateIndexPage(template, items) {
-  let cards = "";
-
-  for (const item of items) {
-    let card = `
-      <a href="./${item.page_name}.html" class="news-card">
-        {{thumb}}
-        <div class="info">
-          <div class="title">${escapeHtml(item.title)}</div>
-          <div class="date">${formatDate(item.created_at)}</div>
-          <div class="summary">${escapeHtml(createSummary(item.body))}</div>
-        </div>
-      </a>
-    `;
-
-    if (item.image_url) {
-      card = card.replace(
-        "{{thumb}}",
-        `<img src="${item.image_url}" class="thumb">`
-      );
-    } else {
-      card = card.replace("{{thumb}}", "");
-    }
-
-    cards += card + "\n";
-  }
-
-  return template.replace("{{news_list}}", cards);
-}
-
-// ------------------------------
-// メイン処理
-// ------------------------------
 async function main() {
   console.log("Fetching news from Supabase...");
+  const news = await fetchNews();
+  console.log(`Fetched ${news.length} items.`);
 
-  const { data, error } = await supabase
-    .from("news")
-    .select("*")
-    .eq("published", true)
-    .or("is_deleted.is.null,is_deleted.eq.false")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error(error);
-    process.exit(1);
+  const outputDir = path.join(__dirname, "../pages/news");
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  console.log(`Fetched ${data.length} items.`);
-
-  // テンプレート読み込み
-  const templateDetail = fs.readFileSync(TEMPLATE_DETAIL, "utf-8");
-  const templateIndex = fs.readFileSync(TEMPLATE_INDEX, "utf-8");
-
   // 詳細ページ生成
-  for (const item of data) {
-    const pageName = new Date(item.created_at)
-      .toISOString()
-      .replace(/[-:TZ.]/g, "")
-      .slice(0, 14);
+  for (const item of news) {
+    const filename = `${item.id}.html`;
+    const filePath = path.join(outputDir, filename);
 
-    item.page_name = pageName;
-
-    const html = generateDetailPage(templateDetail, item);
-    const filePath = path.join(NEWS_DIR, `${pageName}.html`);
+    const html = `
+      <html>
+        <body>
+          <h1>${item.title}</h1>
+          <p>${item.content}</p>
+        </body>
+      </html>
+    `;
 
     fs.writeFileSync(filePath, html);
-    console.log(`Generated: ${filePath}`);
+    console.log(`Generated: ${filename}`);
   }
 
   // 一覧ページ生成
-  const indexHtml = generateIndexPage(templateIndex, data);
-  fs.writeFileSync(path.join(NEWS_DIR, "index.html"), indexHtml);
+  const indexHtml = `
+    <html>
+      <body>
+        <h1>News List</h1>
+        <ul>
+          ${news
+            .map((n) => `<li><a href="./${n.id}.html">${n.title}</a></li>`)
+            .join("")}
+        </ul>
+      </body>
+    </html>
+  `;
 
+  fs.writeFileSync(path.join(outputDir, "index.html"), indexHtml);
   console.log("Generated index.html");
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
