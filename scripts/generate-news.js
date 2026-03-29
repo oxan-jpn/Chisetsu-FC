@@ -26,7 +26,9 @@ async function fetchNews() {
     `${SUPABASE_URL}/rest/v1/news` +
     `?select=*` +
     `&deleted_at=is.null` +
-    `&generated=is.false`;
+    `&generated=is.false` +
+    `&body=not.is.null` +
+    `&body=not.eq.""`;
 
   const res = await fetch(url, {
     headers: {
@@ -41,6 +43,7 @@ async function fetchNews() {
 
   return await res.json();
 }
+
 
 // Supabase に generated=true を PATCH
 async function markGenerated(id) {
