@@ -65,7 +65,7 @@ async function markGenerated(id) {
 
 async function main() {
   console.log("Fetching news from Supabase...");
-  const news = await fetchNews();
+const news = (await fetchNews()).filter(n => (n.body ?? "").trim() !== "");
   console.log(`Fetched ${news.length} items.`);
 
   if (news.length === 0) {
