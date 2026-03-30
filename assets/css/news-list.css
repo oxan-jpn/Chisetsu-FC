@@ -1,3 +1,9 @@
+/* --- Safari の自動縮小を完全に止める --- */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 /* ベース */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -5,7 +11,8 @@ body {
   margin: 0;
   padding: 0;
   color: #1a1a1a;
-  font-size: 16px; /* スマホで読みやすい基準値 */
+  font-size: 17px; /* Safari で確実に大きく見える */
+  line-height: 1.6;
 }
 
 /* コンテナ */
@@ -17,7 +24,7 @@ body {
 
 /* 見出し */
 h1 {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
   margin-bottom: 28px;
   color: #111;
@@ -27,14 +34,14 @@ h1 {
 /* ニュースカード */
 .news-item {
   background: #fff;
-  padding: 18px 20px;
-  border-radius: 12px;
-  margin-bottom: 14px;
+  padding: 20px 22px;
+  border-radius: 14px;
+  margin-bottom: 16px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* ホバー（PCのみ） */
+/* PC のみホバー */
 @media (hover: hover) {
   .news-item:hover {
     transform: translateY(-2px);
@@ -44,14 +51,14 @@ h1 {
 
 /* 日付 */
 .news-date {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   margin-bottom: 6px;
 }
 
 /* タイトル */
 .news-title {
-  font-size: 18px; /* スマホで読みやすい */
+  font-size: 19px; /* Safari で小さくならないライン */
   font-weight: 600;
   color: #2563eb;
   text-decoration: none;
@@ -65,7 +72,7 @@ h1 {
   text-decoration: underline;
 }
 
-/* --- PC向けに少し大きくする --- */
+/* PC 向け微調整 */
 @media (min-width: 768px) {
   body {
     font-size: 17px;
