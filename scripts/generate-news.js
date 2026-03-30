@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-// 日時フォーマット（yyyyMMddHHmmss）
+// 日時フォーマット（yyyyMMddHHmmss）→ ファイル名用
 function formatDate(dateStr) {
   const d = new Date(dateStr);
   const yyyy = d.getFullYear();
@@ -18,6 +18,17 @@ function formatDate(dateStr) {
   const mm = String(d.getMinutes()).padStart(2, "0");
   const ss = String(d.getSeconds()).padStart(2, "0");
   return `${yyyy}${MM}${dd}${hh}${mm}${ss}`;
+}
+
+// 表示用フォーマット（yyyy-MM-dd HH:mm）
+function formatDisplayDate(dateStr) {
+  const d = new Date(dateStr);
+  const yyyy = d.getFullYear();
+  const MM = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${yyyy}-${MM}-${dd} ${hh}:${mm}`;
 }
 
 // Supabase REST API で未生成 & 未削除のお知らせを取得
@@ -92,10 +103,8 @@ async function fetchAllNewsForIndex() {
 async function generateIndexPage() {
   let allNews = await fetchAllNewsForIndex();
 
-  // body が空文字・空白のみのものを除外
   allNews = allNews.filter(n => (n.body ?? "").trim() !== "");
 
-  // 新しい順に並べる
   allNews.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   const itemsHtml = allNews
@@ -137,18 +146,16 @@ async function main() {
   console.log("Fetching news from Supabase...");
   let news = await fetchNews();
 
-  // body が空文字・空白のみのものを除外
   news = news.filter(n => (n.body ?? "").trim() !== "");
 
   console.log(`Fetched ${news.length} items.`);
 
   if (news.length === 0) {
     console.log("No new news to generate.");
-    await generateIndexPage(); // 一覧だけ更新するケースもある
+    await generateIndexPage();
     return;
   }
 
-  // テンプレート読み込み
   const templatePath = path.join(__dirname, "../pages/news/template.html");
   const template = fs.readFileSync(templatePath, "utf-8");
 
@@ -161,10 +168,8 @@ async function main() {
     const filename = `${formatDate(item.created_at)}.html`;
     const filePath = path.join(outputDir, filename);
 
-    // テンプレートをコピー
     let html = template;
 
-    // 画像ブロック処理
     if (item.image_url) {
       html = html
         .replace("{{#if image_url}}", "")
@@ -174,30 +179,23 @@ async function main() {
       html = html.replace(/{{#if image_url}}[\s\S]*?{{\/if}}/g, "");
     }
 
-    // 本文の改行を <br> に変換
     const bodyHtml = (item.body ?? "").replace(/\n/g, "<br>");
-
-    // OGP 用の本文サマリー（80文字）
     const summary = (item.body ?? "").slice(0, 80);
 
-    // 通常置換
     html = html
       .replace(/{{title}}/g, item.title ?? "")
-      .replace(/{{date}}/g, item.created_at ?? "")
+      .replace(/{{date}}/g, formatDisplayDate(item.created_at))  // ← 修正ポイント
       .replace(/{{body}}/g, bodyHtml)
       .replace(/{{body_summary}}/g, summary);
 
-    // HTML 書き込み
     fs.writeFileSync(filePath, html);
     console.log(`Generated: ${filename}`);
 
-    // Supabase 側に generated=true をセット
     await markGenerated(item.id);
   }
 
   console.log("All pages generated and marked as generated.");
 
-  // 一覧ページも更新
   await generateIndexPage();
   console.log("Index page updated.");
 }
