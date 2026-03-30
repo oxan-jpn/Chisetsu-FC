@@ -25,7 +25,7 @@ async function fetchNews() {
   const url =
     `${SUPABASE_URL}/rest/v1/news` +
     `?select=*` +
-    `&deleted_at=is.null` +
+    `&is_deleted=eq.false` +   // ← これが正しい（事実）
     `&generated=eq.false` +
     `&body=not.is.null`;
 
@@ -45,7 +45,6 @@ async function fetchNews() {
     throw new Error(`Failed to fetch news: ${res.status} ${res.statusText}`);
   }
 
-  // text を一度読んでいるので、必要なら JSON.parse する
   return JSON.parse(text);
 }
 
