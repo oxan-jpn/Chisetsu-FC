@@ -26,8 +26,10 @@ async function fetchNews() {
     `${SUPABASE_URL}/rest/v1/news` +
     `?select=*` +
     `&deleted_at=is.null` +
-    `&generated=eq.false` +   // boolean は eq.false が安定
-    `&body=not.is.null`;      // 空文字は Node.js 側で除外
+    `&generated=eq.false` +
+    `&body=not.is.null`;
+
+  console.log("REQUEST URL:", url);
 
   const res = await fetch(url, {
     headers: {
@@ -36,11 +38,15 @@ async function fetchNews() {
     },
   });
 
+  const text = await res.text();
+  console.log("RAW RESPONSE:", res.status, res.statusText, text);
+
   if (!res.ok) {
     throw new Error(`Failed to fetch news: ${res.status} ${res.statusText}`);
   }
 
-  return await res.json();
+  // text を一度読んでいるので、必要なら JSON.parse する
+  return JSON.parse(text);
 }
 
 // Supabase に generated=true を PATCH
