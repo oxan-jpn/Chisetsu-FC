@@ -28,6 +28,7 @@ async function fetchNews() {
     `&is_deleted=eq.false` +
     `&generated=eq.false` +
     `&body=not.is.null`;
+
   const res = await fetch(url, {
     headers: {
       apikey: SERVICE_KEY,
@@ -65,6 +66,73 @@ async function markGenerated(id) {
   }
 }
 
+// 一覧ページ用に全件取得
+async function fetchAllNewsForIndex() {
+  const url =
+    `${SUPABASE_URL}/rest/v1/news` +
+    `?select=*` +
+    `&is_deleted=eq.false` +
+    `&body=not.is.null`;
+
+  const res = await fetch(url, {
+    headers: {
+      apikey: SERVICE_KEY,
+      Authorization: `Bearer ${SERVICE_KEY}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch all news for index: ${res.status} ${res.statusText}`);
+  }
+
+  return await res.json();
+}
+
+// 一覧ページ生成
+async function generateIndexPage() {
+  let allNews = await fetchAllNewsForIndex();
+
+  // body が空文字・空白のみのものを除外
+  allNews = allNews.filter(n => (n.body ?? "").trim() !== "");
+
+  // 新しい順に並べる
+  allNews.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  const itemsHtml = allNews
+    .map(n => {
+      const filename = `${formatDate(n.created_at)}.html`;
+      const date = new Date(n.created_at).toLocaleDateString("ja-JP");
+      return `
+        <div class="news-item">
+          <div class="news-date">${date}</div>
+          <a class="news-title" href="./${filename}">${n.title}</a>
+        </div>
+      `;
+    })
+    .join("\n");
+
+  const html = `
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>お知らせ一覧</title>
+  <link rel="stylesheet" href="../../assets/news-list.css">
+</head>
+<body>
+  <div class="container">
+    <h1>お知らせ一覧</h1>
+    ${itemsHtml}
+  </div>
+</body>
+</html>
+`;
+
+  const indexPath = path.join(__dirname, "../pages/news/index.html");
+  fs.writeFileSync(indexPath, html);
+  console.log("Generated: index.html");
+}
+
 async function main() {
   console.log("Fetching news from Supabase...");
   let news = await fetchNews();
@@ -76,6 +144,7 @@ async function main() {
 
   if (news.length === 0) {
     console.log("No new news to generate.");
+    await generateIndexPage(); // 一覧だけ更新するケースもある
     return;
   }
 
@@ -97,13 +166,11 @@ async function main() {
 
     // 画像ブロック処理
     if (item.image_url) {
-      // ブロックの外側だけ削除して中身を残す
       html = html
         .replace("{{#if image_url}}", "")
         .replace("{{/if}}", "")
         .replace(/{{image_url}}/g, item.image_url);
     } else {
-      // ブロック全体を削除
       html = html.replace(/{{#if image_url}}[\s\S]*?{{\/if}}/g, "");
     }
 
@@ -129,6 +196,10 @@ async function main() {
   }
 
   console.log("All pages generated and marked as generated.");
+
+  // 一覧ページも更新
+  await generateIndexPage();
+  console.log("Index page updated.");
 }
 
 main().catch((err) => {
