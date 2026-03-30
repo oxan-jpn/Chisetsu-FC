@@ -25,12 +25,9 @@ async function fetchNews() {
   const url =
     `${SUPABASE_URL}/rest/v1/news` +
     `?select=*` +
-    `&is_deleted=eq.false` +   // ← これが正しい（事実）
+    `&is_deleted=eq.false` +
     `&generated=eq.false` +
     `&body=not.is.null`;
-
-  console.log("REQUEST URL:", url);
-
   const res = await fetch(url, {
     headers: {
       apikey: SERVICE_KEY,
