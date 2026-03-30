@@ -1,0 +1,41 @@
+body {
+  font-family: sans-serif;
+  background: #fafafa;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 24px;
+  border-left: 4px solid #0078d4;
+  padding-left: 12px;
+}
+
+.news-item {
+  padding: 16px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.news-date {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.news-title {
+  font-size: 18px;
+  color: #0078d4;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.news-title:hover {
+  text-decoration: underline;
+}
