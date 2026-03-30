@@ -117,7 +117,7 @@ async function generateIndexPage() {
 <head>
   <meta charset="UTF-8" />
   <title>お知らせ一覧</title>
-  <link rel="stylesheet" href="../../assets/news-list.css">
+  <link rel="stylesheet" href="../../assets/css/news-list.css">
 </head>
 <body>
   <div class="container">
