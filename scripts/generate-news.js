@@ -26,8 +26,8 @@ async function fetchNews() {
     `${SUPABASE_URL}/rest/v1/news` +
     `?select=*` +
     `&deleted_at=is.null` +
-    `&generated=is.false` +
-    `&body=not.is.null`;
+    `&generated=eq.false` +   // ← ここが重要
+    `&body=not.is.null`;      // 空文字は Node.js 側で弾く
 
   const res = await fetch(url, {
     headers: {
