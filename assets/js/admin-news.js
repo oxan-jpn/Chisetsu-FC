@@ -15,6 +15,32 @@ function toNullable(value) {
 }
 
 // ==============================
+// アップロードエラーをユーザー向けに変換
+// ==============================
+function getUploadErrorMessage(error) {
+  if (!error) return "画像のアップロードに失敗しました";
+
+  if (error.statusCode === 413) {
+    return "画像サイズが大きすぎます（上限を超えています）";
+  }
+  if (error.statusCode === 400) {
+    return "画像形式が正しくありません（対応形式: jpg, png, webp など）";
+  }
+  if (error.statusCode === 401 || error.statusCode === 403) {
+    return "画像アップロードの権限がありません（管理者に連絡してください）";
+  }
+  if (error.statusCode === 409) {
+    return "同じ名前の画像がすでに存在します。別の画像名にしてください。";
+  }
+
+  if (error.message?.includes("Failed to fetch")) {
+    return "ネットワークエラーが発生しました。通信環境を確認してください。";
+  }
+
+  return `画像のアップロードに失敗しました（${error.message ?? "不明なエラー"}）`;
+}
+
+// ==============================
 // DOM 参照
 // ==============================
 const body = document.body;
@@ -194,7 +220,7 @@ async function handleCreateSubmit() {
 
     if (uploadError) {
       console.error(uploadError);
-      showInlineMessage("画像のアップロードに失敗しました");
+      showInlineMessage(getUploadErrorMessage(uploadError));
       return;
     }
 
@@ -292,7 +318,7 @@ async function handleEditSubmit() {
 
     if (uploadError) {
       console.error(uploadError);
-      showInlineMessage("画像のアップロードに失敗しました");
+      showInlineMessage(getUploadErrorMessage(uploadError));
       return;
     }
 
