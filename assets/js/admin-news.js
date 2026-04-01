@@ -41,6 +41,22 @@ function getUploadErrorMessage(error) {
 }
 
 // ==============================
+// ボタンローディング制御
+// ==============================
+function startButtonLoading(button, loadingText = "処理中…") {
+  button.dataset.originalText = button.textContent;
+  button.textContent = loadingText;
+  button.classList.add("button--loading");
+  button.disabled = true;
+}
+
+function stopButtonLoading(button) {
+  button.textContent = button.dataset.originalText;
+  button.classList.remove("button--loading");
+  button.disabled = false;
+}
+
+// ==============================
 // DOM 参照
 // ==============================
 const body = document.body;
@@ -196,6 +212,7 @@ async function populateSelect(selectElement) {
 // ==============================
 async function handleCreateSubmit() {
   clearInlineMessage();
+  startButtonLoading(createSubmitButton, "投稿中…");
 
   const title = createTitleInput.value.trim();
   const body = toNullable(createBodyInput.value);
@@ -204,13 +221,13 @@ async function handleCreateSubmit() {
   const file = createImageInput.files[0];
 
   if (!title) {
+    stopButtonLoading(createSubmitButton);
     showInlineMessage("タイトルは必須です");
     return;
   }
 
   let imageUrl = null;
 
-  // 画像アップロード
   if (file) {
     const filePath = `news/${Date.now()}_${file.name}`;
 
@@ -219,6 +236,7 @@ async function handleCreateSubmit() {
       .upload(filePath, file);
 
     if (uploadError) {
+      stopButtonLoading(createSubmitButton);
       console.error(uploadError);
       showInlineMessage(getUploadErrorMessage(uploadError));
       return;
@@ -240,6 +258,8 @@ async function handleCreateSubmit() {
     is_deleted: false,
     published: true
   });
+
+  stopButtonLoading(createSubmitButton);
 
   if (error) {
     console.error(error);
@@ -288,9 +308,11 @@ async function fillEditForm(id) {
 
 async function handleEditSubmit() {
   clearInlineMessage();
+  startButtonLoading(editSubmitButton, "更新中…");
 
   const id = editSelect.value;
   if (!id) {
+    stopButtonLoading(editSubmitButton);
     showInlineMessage("修正する投稿を選択してください");
     return;
   }
@@ -302,13 +324,13 @@ async function handleEditSubmit() {
   const file = editImageInput.files[0];
 
   if (!title) {
+    stopButtonLoading(editSubmitButton);
     showInlineMessage("タイトルは必須です");
     return;
   }
 
   let imageUrl = editImageInput.dataset.currentImage || null;
 
-  // 新しい画像が選ばれた場合のみアップロード
   if (file) {
     const filePath = `news/${Date.now()}_${file.name}`;
 
@@ -317,6 +339,7 @@ async function handleEditSubmit() {
       .upload(filePath, file);
 
     if (uploadError) {
+      stopButtonLoading(editSubmitButton);
       console.error(uploadError);
       showInlineMessage(getUploadErrorMessage(uploadError));
       return;
@@ -341,6 +364,8 @@ async function handleEditSubmit() {
     })
     .eq("id", id)
     .or("is_deleted.is.null,is_deleted.eq.false");
+
+  stopButtonLoading(editSubmitButton);
 
   if (error) {
     console.error(error);
