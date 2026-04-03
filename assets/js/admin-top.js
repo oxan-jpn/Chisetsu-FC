@@ -58,3 +58,23 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   // 成功 → ログイン画面へ
   window.location.href = "/Chisetsu-FC/pages/admin/login.html";
 });
+
+async function showJwtDebug() {
+  const { data } = await supabaseClient.auth.getSession();
+  const jwt = data?.session?.access_token;
+
+  if (!jwt) {
+    document.getElementById("jwtDebug").textContent = "JWT が取得できませんでした";
+    return;
+  }
+
+  // JWT の payload をデコード
+  const payload = JSON.parse(atob(jwt.split(".")[1]));
+
+  document.getElementById("jwtDebug").textContent =
+    "JWT Payload:\n" + JSON.stringify(payload, null, 2);
+}
+
+// 初期化後に実行
+showJwtDebug();
+
