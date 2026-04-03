@@ -60,7 +60,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
 });
 
 async function showJwtDebug() {
-  const { data } = await supabaseClient.auth.getSession();
+  const { data } = await client.auth.getSession();
   const jwt = data?.session?.access_token;
 
   if (!jwt) {
