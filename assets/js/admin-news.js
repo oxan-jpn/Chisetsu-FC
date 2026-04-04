@@ -228,26 +228,32 @@ async function handleCreateSubmit() {
 
   let imageUrl = null;
 
-  if (file) {
-    const filePath = `news/${Date.now()}_${file.name}`;
+if (file) {
+  const filePath = `news/${Date.now()}_${file.name}`;
 
-    const { error: uploadError } = await supabaseClient.storage
-      .from("news-images")
-      .upload(filePath, file);
+  const { data: uploadData, error: uploadError } = await supabaseClient.storage
+    .from("news-images")
+    .upload(filePath, file);
 
-    if (uploadError) {
-      stopButtonLoading(createSubmitButton);
-      console.error(uploadError);
-      showInlineMessage(getUploadErrorMessage(uploadError));
-      return;
-    }
+  // デバッグ出力
+  document.getElementById("uploadDebug").textContent =
+    "UPLOAD RESULT:\n" +
+    JSON.stringify({ uploadData, uploadError }, null, 2);
 
-    const { data: urlData } = supabaseClient.storage
-      .from("news-images")
-      .getPublicUrl(filePath);
-
-    imageUrl = urlData.publicUrl;
+  if (uploadError) {
+    stopButtonLoading(createSubmitButton);
+    console.error(uploadError);
+    showInlineMessage(getUploadErrorMessage(uploadError));
+    return;
   }
+
+  const { data: urlData } = supabaseClient.storage
+    .from("news-images")
+    .getPublicUrl(filePath);
+
+  imageUrl = urlData.publicUrl;
+}
+
 
   const { error } = await supabaseClient.from("news").insert({
     title,
