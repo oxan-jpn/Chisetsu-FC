@@ -235,11 +235,6 @@ if (file) {
     .from("news-images")
     .upload(filePath, file);
 
-  // デバッグ出力
-  document.getElementById("uploadDebug").textContent =
-    "UPLOAD RESULT:\n" +
-    JSON.stringify({ uploadData, uploadError }, null, 2);
-
   if (uploadError) {
     stopButtonLoading(createSubmitButton);
     console.error(uploadError);
