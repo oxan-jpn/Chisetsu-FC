@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>画像テスト</title>
+
+  <!-- SNS 共有用（任意） -->
+  <meta property="og:title" content="画像テスト">
+  <meta property="og:description" content="画像のテストです">
+  
+    <meta property="og:image" content="https://jyzborkzgcmcqousqopx.supabase.co/storage/v1/object/public/news-images/news/1775322784563_IMG_8168.png">
+  
+
+  <link rel="stylesheet" href="../../assets/css/news-detail.css">
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- タイトル（左寄せ） -->
+    <div class="title">画像テスト</div>
+
+    <!-- 日付（右寄せ） -->
+    <div class="date">2026-04-04 17:13</div>
+
+    <!-- 画像（null の場合は GitHub Actions 側で削除） -->
+    {{#if image_url}}
+      <img src="https://jyzborkzgcmcqousqopx.supabase.co/storage/v1/object/public/news-images/news/1775322784563_IMG_8168.png" alt="" class="news-image">
+    {{/if}}
+
+    <!-- 本文 -->
+    <div class="body">
+      画像のテストです
+    </div>
+
+    <!-- 戻るボタン -->
+    <a href="/Chisetsu-FC/pages/news/index.html" class="back-button">← お知らせ一覧へ戻る</a>
+
+  </div>
+
+</body>
+</html>
