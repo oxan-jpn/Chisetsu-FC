@@ -171,21 +171,20 @@ async function main() {
 
     let html = template;
 
-    if (item.image_url) {
-      html = html
-        .replace("{{#if image_url}}", "")
-        .replace("{{/if}}", "")
-        .replace(/{{image_url}}/g, item.image_url);
-    } else {
-      html = html.replace(/{{#if image_url}}[\s\S]*?{{\/if}}/g, "");
-    }
+    // 🔥 画像ブロックの完全置換（画像あり・なし両対応）
+    html = html.replace(
+      /{{#if image_url}}[\s\S]*?{{\/if}}/g,
+      item.image_url
+        ? `<img src="${item.image_url}" alt="" class="news-image">`
+        : ""
+    );
 
     const bodyHtml = (item.body ?? "").replace(/\n/g, "<br>");
     const summary = (item.body ?? "").slice(0, 80);
 
     html = html
       .replace(/{{title}}/g, item.title ?? "")
-      .replace(/{{date}}/g, formatDisplayDate(item.created_at))  // ← 修正ポイント
+      .replace(/{{date}}/g, formatDisplayDate(item.created_at))
       .replace(/{{body}}/g, bodyHtml)
       .replace(/{{body_summary}}/g, summary);
 
