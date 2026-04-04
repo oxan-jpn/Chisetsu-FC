@@ -68,16 +68,12 @@ const deleteSection = document.getElementById("deleteSection");
 
 const createTitleInput = document.getElementById("createTitle");
 const createBodyInput = document.getElementById("createBody");
-const createUrlInput = document.getElementById("createUrl");
-const createLinkTextInput = document.getElementById("createLinkText");
 const createImageInput = document.getElementById("createImage");
 const createSubmitButton = document.getElementById("createSubmit");
 
 const editSelect = document.getElementById("editSelect");
 const editTitleInput = document.getElementById("editTitle");
 const editBodyInput = document.getElementById("editBody");
-const editUrlInput = document.getElementById("editUrl");
-const editLinkTextInput = document.getElementById("editLinkText");
 const editImageInput = document.getElementById("editImage");
 const editSubmitButton = document.getElementById("editSubmit");
 
@@ -216,8 +212,6 @@ async function handleCreateSubmit() {
 
   const title = createTitleInput.value.trim();
   const body = toNullable(createBodyInput.value);
-  const url = toNullable(createUrlInput.value);
-  const linkText = toNullable(createLinkTextInput.value);
   const file = createImageInput.files[0];
 
   if (!title) {
@@ -228,33 +222,30 @@ async function handleCreateSubmit() {
 
   let imageUrl = null;
 
-if (file) {
-  const filePath = `news/${Date.now()}_${file.name}`;
+  if (file) {
+    const filePath = `news/${Date.now()}_${file.name}`;
 
-  const { data: uploadData, error: uploadError } = await supabaseClient.storage
-    .from("news-images")
-    .upload(filePath, file);
+    const { data: uploadData, error: uploadError } = await supabaseClient.storage
+      .from("news-images")
+      .upload(filePath, file);
 
-  if (uploadError) {
-    stopButtonLoading(createSubmitButton);
-    console.error(uploadError);
-    showInlineMessage(getUploadErrorMessage(uploadError));
-    return;
+    if (uploadError) {
+      stopButtonLoading(createSubmitButton);
+      console.error(uploadError);
+      showInlineMessage(getUploadErrorMessage(uploadError));
+      return;
+    }
+
+    const { data: urlData } = supabaseClient.storage
+      .from("news-images")
+      .getPublicUrl(filePath);
+
+    imageUrl = urlData.publicUrl;
   }
-
-  const { data: urlData } = supabaseClient.storage
-    .from("news-images")
-    .getPublicUrl(filePath);
-
-  imageUrl = urlData.publicUrl;
-}
-
 
   const { error } = await supabaseClient.from("news").insert({
     title,
     body,
-    url,
-    link_text: linkText,
     image_url: imageUrl,
     is_deleted: false,
     published: true
@@ -275,8 +266,6 @@ if (file) {
 function resetCreateForm() {
   createTitleInput.value = "";
   createBodyInput.value = "";
-  createUrlInput.value = "";
-  createLinkTextInput.value = "";
   createImageInput.value = "";
 }
 
@@ -301,8 +290,6 @@ async function fillEditForm(id) {
 
   editTitleInput.value = data.title || "";
   editBodyInput.value = data.body || "";
-  editUrlInput.value = data.url || "";
-  editLinkTextInput.value = data.link_text || "";
   editImageInput.value = "";
   editImageInput.dataset.currentImage = data.image_url || "";
 }
@@ -320,8 +307,6 @@ async function handleEditSubmit() {
 
   const title = editTitleInput.value.trim();
   const body = toNullable(editBodyInput.value);
-  const url = toNullable(editUrlInput.value);
-  const linkText = toNullable(editLinkTextInput.value);
   const file = editImageInput.files[0];
 
   if (!title) {
@@ -358,8 +343,6 @@ async function handleEditSubmit() {
     .update({
       title,
       body,
-      url,
-      link_text: linkText,
       image_url: imageUrl,
       published: true
     })
