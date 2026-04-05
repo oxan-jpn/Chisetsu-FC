@@ -2,6 +2,15 @@ name: Generate News Pages
 
 on:
   workflow_dispatch:
+    inputs:
+      event:
+        description: "insert / update"
+        required: true
+        type: string
+      slug:
+        description: "slug of the article"
+        required: true
+        type: string
 
 jobs:
   build-news:
