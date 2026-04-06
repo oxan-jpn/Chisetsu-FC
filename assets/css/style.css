@@ -6,7 +6,7 @@
     --white: #FFFFFF;
     --navy: #003049;
     --gray-bg: #F5F5F5;
-    --text-dark: #222;
+    --text-dark((: #222;
 }
 
 body {
@@ -320,3 +320,14 @@ table th {
     font-weight: 600;
 }
 
+.news-more {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.news-more-link {
+    font-size: 0.95rem;
+    color: var(--navy) !important;
+    font-weight: bold;
+    text-decoration: underline;
+}
