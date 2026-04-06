@@ -7,8 +7,8 @@ on:
         description: "insert / update"
         required: true
         type: string
-      slug:
-        description: "slug of the article"
+      id:
+        description: "id of the news item"
         required: true
         type: string
 
@@ -20,7 +20,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref }}
+          ref: dev/copilot
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -32,6 +32,8 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEWS_ID: ${{ github.event.inputs.id }}
+          NEWS_EVENT: ${{ github.event.inputs.event }}
 
       - name: Commit and push generated pages
         run: |
