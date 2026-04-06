@@ -40,7 +40,7 @@ async function fetchNews() {
     }
 
     // --- HTML 生成 ---
-    list.innerHTML = data.map(itemHTML).join("");
+list.innerHTML = data.slice(0, 5).map(itemHTML).join("");
 }
 
 function itemHTML(n) {
