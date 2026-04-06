@@ -8,6 +8,9 @@ const __dirname = path.dirname(__filename);
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+const TARGET_ID = process.env.NEWS_ID;      // ← GitHub Actions から渡される
+const EVENT = process.env.NEWS_EVENT;       // insert / update
+
 // 日時フォーマット（yyyyMMddHHmmss）→ ファイル名用
 function formatDate(dateStr) {
   const d = new Date(dateStr);
@@ -31,14 +34,12 @@ function formatDisplayDate(dateStr) {
   return `${yyyy}-${MM}-${dd} ${hh}:${mm}`;
 }
 
-// Supabase REST API で未生成 & 未削除のお知らせを取得
-async function fetchNews() {
+// 単体記事取得
+async function fetchOneNews(id) {
   const url =
     `${SUPABASE_URL}/rest/v1/news` +
     `?select=*` +
-    `&is_deleted=eq.false` +
-    `&generated=eq.false` +
-    `&body=not.is.null`;
+    `&id=eq.${id}`;
 
   const res = await fetch(url, {
     headers: {
@@ -48,13 +49,12 @@ async function fetchNews() {
   });
 
   const text = await res.text();
-  console.log("RAW RESPONSE:", res.status, res.statusText, text);
+  console.log("FETCH ONE RAW:", res.status, text);
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch news: ${res.status} ${res.statusText}`);
-  }
+  if (!res.ok) throw new Error("Failed to fetch single news");
 
-  return JSON.parse(text);
+  const arr = JSON.parse(text);
+  return arr[0] ?? null;
 }
 
 // Supabase に generated=true を PATCH
@@ -92,9 +92,7 @@ async function fetchAllNewsForIndex() {
     },
   });
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch all news for index: ${res.status} ${res.statusText}`);
-  }
+  if (!res.ok) throw new Error("Failed to fetch all news");
 
   return await res.json();
 }
@@ -104,7 +102,6 @@ async function generateIndexPage() {
   let allNews = await fetchAllNewsForIndex();
 
   allNews = allNews.filter(n => (n.body ?? "").trim() !== "");
-
   allNews.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   const itemsHtml = allNews
@@ -144,57 +141,60 @@ async function generateIndexPage() {
 }
 
 async function main() {
-  console.log("Fetching news from Supabase...");
-  let news = await fetchNews();
+  console.log("TARGET ID:", TARGET_ID, "EVENT:", EVENT);
 
-  news = news.filter(n => (n.body ?? "").trim() !== "");
+  const item = await fetchOneNews(TARGET_ID);
 
-  console.log(`Fetched ${news.length} items.`);
-
-  if (news.length === 0) {
-    console.log("No new news to generate.");
-    await generateIndexPage();
+  if (!item) {
+    console.log("Item not found. Nothing to do.");
     return;
   }
-
-  const templatePath = path.join(__dirname, "../pages/news/template.html");
-  const template = fs.readFileSync(templatePath, "utf-8");
 
   const outputDir = path.join(__dirname, "../pages/news");
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  for (const item of news) {
-    const filename = `${formatDate(item.created_at)}.html`;
-    const filePath = path.join(outputDir, filename);
+  const filename = `${formatDate(item.created_at)}.html`;
+  const filePath = path.join(outputDir, filename);
 
-    let html = template;
-
-    // 🔥 画像ブロックの完全置換（画像あり・なし両対応）
-    html = html.replace(
-      /{{#if image_url}}[\s\S]*?{{\/if}}/g,
-      item.image_url
-        ? `<img src="${item.image_url}" alt="" class="news-image">`
-        : ""
-    );
-
-    const bodyHtml = (item.body ?? "").replace(/\n/g, "<br>");
-    const summary = (item.body ?? "").slice(0, 80);
-
-    html = html
-      .replace(/{{title}}/g, item.title ?? "")
-      .replace(/{{date}}/g, formatDisplayDate(item.created_at))
-      .replace(/{{body}}/g, bodyHtml)
-      .replace(/{{body_summary}}/g, summary);
-
-    fs.writeFileSync(filePath, html);
-    console.log(`Generated: ${filename}`);
-
-    await markGenerated(item.id);
+  // 🔥 論理削除の場合
+  if (item.is_deleted) {
+    console.log("Logical delete detected. Removing HTML:", filePath);
+    fs.rmSync(filePath, { force: true });
+    await generateIndexPage();
+    return;
   }
 
-  console.log("All pages generated and marked as generated.");
+  // 🔥 INSERT / UPDATE → 既存ファイル削除 → 再生成
+  fs.rmSync(filePath, { force: true });
+
+  const templatePath = path.join(__dirname, "../pages/news/template.html");
+  const template = fs.readFileSync(templatePath, "utf-8");
+
+  let html = template;
+
+  // 画像ブロック置換
+  html = html.replace(
+    /{{#if image_url}}[\s\S]*?{{\/if}}/g,
+    item.image_url
+      ? `<img src="${item.image_url}" alt="" class="news-image">`
+      : ""
+  );
+
+  const bodyHtml = (item.body ?? "").replace(/\n/g, "<br>");
+  const summary = (item.body ?? "").slice(0, 80);
+
+  html = html
+    .replace(/{{title}}/g, item.title ?? "")
+    .replace(/{{date}}/g, formatDisplayDate(item.created_at))
+    .replace(/{{body}}/g, bodyHtml)
+    .replace(/{{body_summary}}/g, summary);
+
+  fs.writeFileSync(filePath, html);
+  console.log("Generated:", filename);
+
+  await markGenerated(item.id);
 
   await generateIndexPage();
   console.log("Index page updated.");
