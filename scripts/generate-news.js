@@ -8,12 +8,22 @@ const __dirname = path.dirname(__filename);
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const TARGET_ID = process.env.NEWS_ID;      // ← GitHub Actions から渡される
+const TARGET_ID = process.env.NEWS_ID;      // GitHub Actions から渡される
 const EVENT = process.env.NEWS_EVENT;       // insert / update
 
-// 日時フォーマット（yyyyMMddHHmmss）→ ファイル名用
-function formatDate(dateStr) {
+/* ============================================================
+   UTC → JST（日本時間）変換
+============================================================ */
+function toJST(dateStr) {
   const d = new Date(dateStr);
+  return new Date(d.getTime() + 9 * 60 * 60 * 1000);
+}
+
+/* ============================================================
+   ファイル名用フォーマット（yyyyMMddHHmmss）
+============================================================ */
+function formatDate(dateStr) {
+  const d = toJST(dateStr);
   const yyyy = d.getFullYear();
   const MM = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
@@ -23,9 +33,11 @@ function formatDate(dateStr) {
   return `${yyyy}${MM}${dd}${hh}${mm}${ss}`;
 }
 
-// 表示用フォーマット（yyyy-MM-dd HH:mm）
+/* ============================================================
+   表示用フォーマット（yyyy-MM-dd HH:mm）
+============================================================ */
 function formatDisplayDate(dateStr) {
-  const d = new Date(dateStr);
+  const d = toJST(dateStr);
   const yyyy = d.getFullYear();
   const MM = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
@@ -34,7 +46,9 @@ function formatDisplayDate(dateStr) {
   return `${yyyy}-${MM}-${dd} ${hh}:${mm}`;
 }
 
-// 単体記事取得
+/* ============================================================
+   単体記事取得
+============================================================ */
 async function fetchOneNews(id) {
   const url =
     `${SUPABASE_URL}/rest/v1/news` +
@@ -57,7 +71,9 @@ async function fetchOneNews(id) {
   return arr[0] ?? null;
 }
 
-// Supabase に generated=true を PATCH
+/* ============================================================
+   Supabase に generated=true を PATCH
+============================================================ */
 async function markGenerated(id) {
   const url = `${SUPABASE_URL}/rest/v1/news?id=eq.${id}`;
 
@@ -77,7 +93,9 @@ async function markGenerated(id) {
   }
 }
 
-// 一覧ページ用に全件取得
+/* ============================================================
+   一覧ページ用に全件取得
+============================================================ */
 async function fetchAllNewsForIndex() {
   const url =
     `${SUPABASE_URL}/rest/v1/news` +
@@ -97,7 +115,9 @@ async function fetchAllNewsForIndex() {
   return await res.json();
 }
 
-// 一覧ページ生成
+/* ============================================================
+   一覧ページ生成
+============================================================ */
 async function generateIndexPage() {
   let allNews = await fetchAllNewsForIndex();
 
@@ -107,7 +127,7 @@ async function generateIndexPage() {
   const itemsHtml = allNews
     .map(n => {
       const filename = `${formatDate(n.created_at)}.html`;
-      const date = new Date(n.created_at).toLocaleDateString("ja-JP");
+      const date = toJST(n.created_at).toLocaleDateString("ja-JP");
       return `
         <div class="news-item">
           <div class="news-date">${date}</div>
@@ -140,6 +160,9 @@ async function generateIndexPage() {
   console.log("Generated: index.html");
 }
 
+/* ============================================================
+   メイン処理
+============================================================ */
 async function main() {
   console.log("TARGET ID:", TARGET_ID, "EVENT:", EVENT);
 
@@ -158,7 +181,9 @@ async function main() {
   const filename = `${formatDate(item.created_at)}.html`;
   const filePath = path.join(outputDir, filename);
 
-  // 🔥 論理削除の場合
+  /* ------------------------------------------------------------
+     論理削除 → HTML 削除して一覧更新
+  ------------------------------------------------------------ */
   if (item.is_deleted) {
     console.log("Logical delete detected. Removing HTML:", filePath);
     fs.rmSync(filePath, { force: true });
@@ -166,7 +191,9 @@ async function main() {
     return;
   }
 
-  // 🔥 INSERT / UPDATE → 既存ファイル削除 → 再生成
+  /* ------------------------------------------------------------
+     INSERT / UPDATE → 既存ファイル削除 → 再生成
+  ------------------------------------------------------------ */
   fs.rmSync(filePath, { force: true });
 
   const templatePath = path.join(__dirname, "../pages/news/template.html");
@@ -182,7 +209,11 @@ async function main() {
       : ""
   );
 
-  const bodyHtml = (item.body ?? "").replace(/\n/g, "<br>");
+  // 本文：trim() で余計なスペース除去
+  const bodyHtml = (item.body ?? "")
+    .trim()
+    .replace(/\n/g, "<br>");
+
   const summary = (item.body ?? "").slice(0, 80);
 
   html = html
