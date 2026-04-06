@@ -137,6 +137,13 @@ async function generateIndexPage() {
     })
     .join("\n");
 
+  // 🔥 ここで「トップに戻る」リンクを追加
+  const backToTopHtml = `
+    <div class="back-to-top-wrapper">
+      <a href="../index.html" class="back-to-top-link">▶ トップページへ戻る</a>
+    </div>
+  `;
+
   const html = `
 <!DOCTYPE html>
 <html lang="ja">
@@ -150,6 +157,8 @@ async function generateIndexPage() {
   <div class="container">
     <h1>お知らせ一覧</h1>
     ${itemsHtml}
+
+    ${backToTopHtml}
   </div>
 </body>
 </html>
