@@ -87,6 +87,14 @@ textarea {
   background: #fff;
 }
 
+input[type="date"],
+input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 44px;
+  line-height: 44px;
+}
+
 textarea {
   min-height: 80px;
   resize: vertical;
