@@ -409,3 +409,14 @@ table th {
     filter: blur(1px);
   }
 }
+
+.news-link-wrapper {
+  display: block;
+  padding: 8px 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.news-link-wrapper:hover {
+  opacity: 0.8;
+}
