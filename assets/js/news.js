@@ -46,7 +46,7 @@ function escapeHTML(str) {
 function renderNewsItem(item) {
   const date = toJST(item.created_at).toLocaleDateString("ja-JP");
   const fileName = formatFileName(item.created_at);
-  const detailUrl = `../news/${fileName}.html`;
+  const detailUrl = `../pages/news/${fileName}.html`;
 
   return `
     <li class="news-item">
