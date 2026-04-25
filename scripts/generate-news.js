@@ -12,10 +12,18 @@ const TARGET_ID = process.env.NEWS_ID; // GitHub Actions から渡される
 const EVENT = process.env.NEWS_EVENT;  // insert / update
 
 /* ============================================================
-   ファイル名用フォーマット（UTC のまま yyyyMMddHHmmss）
+   UTC → JST（日本時間）変換
+============================================================ */
+function toJST(dateStr) {
+  const d = new Date(dateStr);
+  return new Date(d.getTime() + 9 * 60 * 60 * 1000);
+}
+
+/* ============================================================
+   ファイル名用フォーマット（JST yyyyMMddHHmmss）
 ============================================================ */
 function formatDateForFile(dateStr) {
-  const d = new Date(dateStr);
+  const d = toJST(dateStr);
   const yyyy = d.getFullYear();
   const MM = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
@@ -26,10 +34,10 @@ function formatDateForFile(dateStr) {
 }
 
 /* ============================================================
-   表示用フォーマット（UTC のまま yyyy-MM-dd HH:mm）
+   表示用フォーマット（JST yyyy-MM-dd HH:mm）
 ============================================================ */
 function formatDisplayDate(dateStr) {
-  const d = new Date(dateStr);
+  const d = toJST(dateStr);
   const yyyy = d.getFullYear();
   const MM = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
@@ -119,7 +127,7 @@ async function generateIndexPage() {
   const itemsHtml = allNews
     .map(n => {
       const filename = `${formatDateForFile(n.created_at)}.html`;
-      const date = new Date(n.created_at).toLocaleDateString("ja-JP");
+      const date = toJST(n.created_at).toLocaleDateString("ja-JP");
 
       return `
         <div class="news-item">
