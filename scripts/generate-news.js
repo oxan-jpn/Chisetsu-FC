@@ -8,22 +8,14 @@ const __dirname = path.dirname(__filename);
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const TARGET_ID = process.env.NEWS_ID;      // GitHub Actions から渡される
-const EVENT = process.env.NEWS_EVENT;       // insert / update
+const TARGET_ID = process.env.NEWS_ID; // GitHub Actions から渡される
+const EVENT = process.env.NEWS_EVENT;  // insert / update
 
 /* ============================================================
-   UTC → JST（日本時間）変換
+   ファイル名用フォーマット（UTC のまま yyyyMMddHHmmss）
 ============================================================ */
-function toJST(dateStr) {
+function formatDateForFile(dateStr) {
   const d = new Date(dateStr);
-  return new Date(d.getTime() + 9 * 60 * 60 * 1000);
-}
-
-/* ============================================================
-   ファイル名用フォーマット（yyyyMMddHHmmss）
-============================================================ */
-function formatDate(dateStr) {
-  const d = toJST(dateStr);
   const yyyy = d.getFullYear();
   const MM = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
@@ -34,10 +26,10 @@ function formatDate(dateStr) {
 }
 
 /* ============================================================
-   表示用フォーマット（yyyy-MM-dd HH:mm）
+   表示用フォーマット（UTC のまま yyyy-MM-dd HH:mm）
 ============================================================ */
 function formatDisplayDate(dateStr) {
-  const d = toJST(dateStr);
+  const d = new Date(dateStr);
   const yyyy = d.getFullYear();
   const MM = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
@@ -47,13 +39,10 @@ function formatDisplayDate(dateStr) {
 }
 
 /* ============================================================
-   単体記事取得
+   Supabase から単体記事を取得
 ============================================================ */
 async function fetchOneNews(id) {
-  const url =
-    `${SUPABASE_URL}/rest/v1/news` +
-    `?select=*` +
-    `&id=eq.${id}`;
+  const url = `${SUPABASE_URL}/rest/v1/news?select=*&id=eq.${id}`;
 
   const res = await fetch(url, {
     headers: {
@@ -62,12 +51,12 @@ async function fetchOneNews(id) {
     },
   });
 
-  const text = await res.text();
-  console.log("FETCH ONE RAW:", res.status, text);
+  if (!res.ok) {
+    console.error("Failed to fetch single news:", res.status);
+    return null;
+  }
 
-  if (!res.ok) throw new Error("Failed to fetch single news");
-
-  const arr = JSON.parse(text);
+  const arr = await res.json();
   return arr[0] ?? null;
 }
 
@@ -121,13 +110,17 @@ async function fetchAllNewsForIndex() {
 async function generateIndexPage() {
   let allNews = await fetchAllNewsForIndex();
 
+  // 空データ除外
   allNews = allNews.filter(n => (n.body ?? "").trim() !== "");
+
+  // 新しい順
   allNews.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   const itemsHtml = allNews
     .map(n => {
-      const filename = `${formatDate(n.created_at)}.html`;
-      const date = toJST(n.created_at).toLocaleDateString("ja-JP");
+      const filename = `${formatDateForFile(n.created_at)}.html`;
+      const date = new Date(n.created_at).toLocaleDateString("ja-JP");
+
       return `
         <div class="news-item">
           <div class="news-date">${date}</div>
@@ -137,10 +130,9 @@ async function generateIndexPage() {
     })
     .join("\n");
 
-  // 🔥 ここで「トップに戻る」リンクを追加
   const backToTopHtml = `
     <div class="back-to-top-wrapper">
-      <a href="../index.html" class="back-to-top-link">トップページへ戻る&nbsp;&rang;</a>
+      <a href="../index.html" class="back-to-top-link">トップページへ戻る &rang;</a>
     </div>
   `;
 
@@ -157,7 +149,6 @@ async function generateIndexPage() {
   <div class="container">
     <h1>お知らせ一覧</h1>
     ${itemsHtml}
-
     ${backToTopHtml}
   </div>
 </body>
@@ -167,6 +158,39 @@ async function generateIndexPage() {
   const indexPath = path.join(__dirname, "../pages/news/index.html");
   fs.writeFileSync(indexPath, html);
   console.log("Generated: index.html");
+}
+
+/* ============================================================
+   詳細ページ生成
+============================================================ */
+function generateDetailPage(item, filePath) {
+  const templatePath = path.join(__dirname, "../pages/news/template.html");
+  const template = fs.readFileSync(templatePath, "utf-8");
+
+  let html = template;
+
+  // 画像ブロック置換
+  html = html.replace(
+    /{{#if image_url}}[\s\S]*?{{\/if}}/g,
+    item.image_url
+      ? `<img src="${item.image_url}" alt="" class="news-image">`
+      : ""
+  );
+
+  const bodyHtml = (item.body ?? "")
+    .trim()
+    .replace(/\n/g, "<br>");
+
+  const summary = (item.body ?? "").slice(0, 80);
+
+  html = html
+    .replace(/{{title}}/g, item.title ?? "")
+    .replace(/{{date}}/g, formatDisplayDate(item.created_at))
+    .replace(/{{body}}/g, bodyHtml)
+    .replace(/{{body_summary}}/g, summary);
+
+  fs.writeFileSync(filePath, html);
+  console.log("Generated:", filePath);
 }
 
 /* ============================================================
@@ -187,60 +211,26 @@ async function main() {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  const filename = `${formatDate(item.created_at)}.html`;
+  const filename = `${formatDateForFile(item.created_at)}.html`;
   const filePath = path.join(outputDir, filename);
 
-  /* ------------------------------------------------------------
-     論理削除 → HTML 削除して一覧更新
-  ------------------------------------------------------------ */
+  // 論理削除
   if (item.is_deleted) {
-    console.log("Logical delete detected. Removing HTML:", filePath);
+    console.log("Logical delete detected. Removing:", filePath);
     fs.rmSync(filePath, { force: true });
     await generateIndexPage();
     return;
   }
 
-  /* ------------------------------------------------------------
-     INSERT / UPDATE → 既存ファイル削除 → 再生成
-  ------------------------------------------------------------ */
+  // 再生成
   fs.rmSync(filePath, { force: true });
-
-  const templatePath = path.join(__dirname, "../pages/news/template.html");
-  const template = fs.readFileSync(templatePath, "utf-8");
-
-  let html = template;
-
-  // 画像ブロック置換
-  html = html.replace(
-    /{{#if image_url}}[\s\S]*?{{\/if}}/g,
-    item.image_url
-      ? `<img src="${item.image_url}" alt="" class="news-image">`
-      : ""
-  );
-
-  // 本文：trim() で余計なスペース除去
-  const bodyHtml = (item.body ?? "")
-    .trim()
-    .replace(/\n/g, "<br>");
-
-  const summary = (item.body ?? "").slice(0, 80);
-
-  html = html
-    .replace(/{{title}}/g, item.title ?? "")
-    .replace(/{{date}}/g, formatDisplayDate(item.created_at))
-    .replace(/{{body}}/g, bodyHtml)
-    .replace(/{{body_summary}}/g, summary);
-
-  fs.writeFileSync(filePath, html);
-  console.log("Generated:", filename);
+  generateDetailPage(item, filePath);
 
   await markGenerated(item.id);
-
   await generateIndexPage();
-  console.log("Index page updated.");
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error(err);
   process.exit(1);
 });
