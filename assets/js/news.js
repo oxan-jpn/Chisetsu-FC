@@ -15,9 +15,6 @@ function toJST(dateStr) {
   return new Date(d.getTime() + 9 * 60 * 60 * 1000);
 }
 
-/* ============================================================
-   yyyyMMddHHmmss 形式に変換（詳細ページのファイル名用）
-============================================================ */
 function formatFileName(dateStr) {
   const d = toJST(dateStr);
   const yyyy = d.getFullYear();
