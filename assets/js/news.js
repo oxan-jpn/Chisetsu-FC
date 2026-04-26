@@ -8,21 +8,20 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ============================================================
-   UTC → JST（日本時間）変換
+   ファイル名用フォーマット（JST yyyyMMddHHmmss）
+   ※ ブラウザは created_at を JST として解釈するため、
+      追加の JST 変換は不要
 ============================================================ */
-function toJST(dateStr) {
-  const d = new Date(dateStr);
-  return new Date(d.getTime() + 9 * 60 * 60 * 1000);
-}
-
 function formatFileName(dateStr) {
-  const d = toJST(dateStr);
+  const d = new Date(dateStr); // JST として扱われる
+
   const yyyy = d.getFullYear();
   const MM = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
   const hh = String(d.getHours()).padStart(2, "0");
   const mm = String(d.getMinutes()).padStart(2, "0");
   const ss = String(d.getSeconds()).padStart(2, "0");
+
   return `${yyyy}${MM}${dd}${hh}${mm}${ss}`;
 }
 
@@ -41,7 +40,10 @@ function escapeHTML(str) {
    お知らせ 1 件分の HTML 生成
 ============================================================ */
 function renderNewsItem(item) {
-  const date = toJST(item.created_at).toLocaleDateString("ja-JP");
+  // 表示日付は 2026/04/26 のまま
+  const date = new Date(item.created_at).toLocaleDateString("ja-JP");
+
+  // ファイル名は Node 側と完全一致
   const fileName = formatFileName(item.created_at);
   const detailUrl = `../pages/news/${fileName}.html`;
 
