@@ -9,7 +9,7 @@
     --text-dark: #222;
 }
 
-body {
+.top-page {
     margin: 0;
     font-family: "Helvetica Neue", Arial, sans-serif;
     background-color: var(--gray-bg);
@@ -70,7 +70,7 @@ a:hover {
 /* ================================
    Section 共通
 ================================ */
-section {
+.top-page section {
     padding: 40px 20px;
     margin: 20px auto;
     max-width: 900px;
@@ -79,7 +79,7 @@ section {
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-section h2 {
+.top-page section h2 {
     border-left: 6px solid var(--main-red);
     padding-left: 10px;
     margin-bottom: 20px;
@@ -105,7 +105,7 @@ section h2 {
 /* ================================
    News Item Layout
 ================================ */
-.news-item {
+.news-list-page .news-item {
     padding: 12px 0;
     border-bottom: 1px solid #ddd;
 }
@@ -114,15 +114,15 @@ section h2 {
     border-bottom: none;
 }
 
-.news-date,
-.news-title,
-.news-link {
+.top-page .news-date,
+.top-page .news-title,
+.top-page .news-link {
     display: block;
     margin-bottom: 4px;
     color: var(--text-dark);
 }
 
-.news-link a {
+.top-page .news-link a {
     color: var(--navy) !important;
     font-weight: bold;
     text-decoration: underline;
@@ -428,26 +428,25 @@ html {
 }
 
 /* ベース */
-body {
+.news-list-page {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: #f5f7fa;
   margin: 0;
   padding: 0;
   color: #1a1a1a;
   font-size: 17px;
-  /* Safari で確実に大きく見える */
   line-height: 1.6;
 }
 
 /* コンテナ */
-.container {
+.news-list-page .container {
   max-width: 820px;
   margin: 32px auto;
   padding: 0 20px;
 }
 
 /* 見出し */
-h1 {
+.news-list-page h1 {
   font-size: 26px;
   font-weight: 700;
   margin-bottom: 28px;
@@ -456,7 +455,7 @@ h1 {
 }
 
 /* ニュースカード */
-.news-item {
+.news-list-page .news-item {
   background: #fff;
   padding: 20px 22px;
   border-radius: 14px;
@@ -467,23 +466,22 @@ h1 {
 
 /* PC のみホバー */
 @media (hover: hover) {
-  .news-item:hover {
+  .news-list-page .news-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
   }
 }
 
 /* 日付 */
-.news-date {
+.news-list-page .news-date {
   font-size: 15px;
   color: #6b7280;
   margin-bottom: 6px;
 }
 
 /* タイトル */
-.news-title {
+.news-list-page .news-title {
   font-size: 19px;
-  /* Safari で小さくならないライン */
   font-weight: 600;
   color: #2563eb;
   text-decoration: none;
@@ -492,27 +490,27 @@ h1 {
   transition: color 0.15s ease;
 }
 
-.news-title:hover {
+.news-list-page .news-title:hover {
   color: #1d4ed8;
   text-decoration: underline;
 }
 
 /* PC 向け微調整 */
 @media (min-width: 768px) {
-  body {
+  .news-list-page {
     font-size: 17px;
   }
 
-  h1 {
+  .news-list-page h1 {
     font-size: 28px;
   }
 
-  .news-title {
+  .news-list-page .news-title {
     font-size: 20px;
   }
 }
 
-body {
+.news-detail-page {
   font-family: sans-serif;
   background: #f7f9fc;
   margin: 0;
@@ -521,7 +519,7 @@ body {
   justify-content: center;
 }
 
-.container {
+.news-detail-page .container {
   width: 100%;
   max-width: 720px;
   background: #fff;
@@ -530,7 +528,7 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.title {
+.news-detail-page .title {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 8px;
@@ -538,21 +536,21 @@ body {
   text-align: left;
 }
 
-.date {
+.news-detail-page .date {
   text-align: right;
   color: #666;
   font-size: 14px;
   margin-bottom: 20px;
 }
 
-.news-image {
+.news-detail-page .news-image {
   width: 100%;
   border-radius: 8px;
   margin-bottom: 20px;
   display: block;
 }
 
-.body {
+.news-detail-page {
   white-space: pre-wrap;
   line-height: 1.7;
   font-size: 16px;
@@ -560,7 +558,7 @@ body {
   margin-bottom: 32px;
 }
 
-.back-button {
+.news-detail-page .back-button {
   display: inline-block;
   padding: 10px 16px;
   background: #eee;
@@ -570,6 +568,6 @@ body {
   font-size: 15px;
 }
 
-.back-button:hover {
+.news-detail-page .back-button:hover {
   background: #ddd;
 }
