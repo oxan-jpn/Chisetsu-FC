@@ -1,58 +1,109 @@
-// assets/js/news.js
-import { supabase } from "./supabaseClient.js"; // ← Supabase クライアントを読み込む
+import { supabase } from "./supabaseClient.js";
 
+/* ============================================================
+   初期化
+============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
-    fetchNews();
+  loadLatestNews();
 });
 
-async function fetchNews() {
-    const list = document.getElementById("news-list");
-    const section = document.getElementById("news-section");
-    const loading = document.getElementById("news-loading"); // ← ローディング要素
+/* ============================================================
+   ファイル名用フォーマット（JST yyyyMMddHHmmss）
+   ※ ブラウザは created_at を JST として解釈するため、
+      追加の JST 変換は不要
+============================================================ */
+function formatFileName(dateStr) {
+  const d = new Date(dateStr); // JST として扱われる
 
+  const yyyy = d.getFullYear();
+  const MM = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  const ss = String(d.getSeconds()).padStart(2, "0");
+
+  return `${yyyy}${MM}${dd}${hh}${mm}${ss}`;
+}
+
+/* ============================================================
+   HTML エスケープ
+============================================================ */
+function escapeHTML(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/* ============================================================
+   お知らせ 1 件分の HTML 生成
+============================================================ */
+function renderNewsItem(item) {
+  // 表示日付は 2026/04/26 のまま
+  const date = new Date(item.created_at).toLocaleDateString("ja-JP");
+
+  // ファイル名は Node 側と完全一致
+  const fileName = formatFileName(item.created_at);
+  const detailUrl = `../pages/news/${fileName}.html`;
+
+  return `
+    <li class="news-item">
+      <a href="${detailUrl}" class="news-link-wrapper">
+        <div class="news-date">${date}</div>
+        <div class="news-title">${escapeHTML(item.title)}</div>
+      </a>
+    </li>
+  `;
+}
+
+/* ============================================================
+   お知らせ取得 → 最新 5 件を表示
+============================================================ */
+async function loadLatestNews() {
+  const list = document.getElementById("news-list");
+  const section = document.getElementById("news-section");
+  const loading = document.getElementById("news-loading");
+
+  try {
     const { data, error } = await supabase
-        .from("news")
-        .select("*")
-        .eq("published", true)
-        .order("created_at", { ascending: false });
+      .from("news")
+      .select("id, title, created_at, is_deleted, published")
+      .eq("published", true)
+      .or("is_deleted.is.null,is_deleted.eq.false")
+      .order("created_at", { ascending: false });
 
-    // 取得完了 → ローディング削除
     if (loading) loading.remove();
 
     if (error) {
-        console.error("ニュース取得エラー:", error);
-        section.innerHTML += `
-            <div class="empty-message">
-                お知らせの取得に失敗しました
-            </div>
-        `;
-        return;
+      console.error("ニュース取得エラー:", error);
+      section.insertAdjacentHTML(
+        "beforeend",
+        `<div class="empty-message">お知らせの取得に失敗しました</div>`
+      );
+      return;
     }
 
     if (!data || data.length === 0) {
-        section.innerHTML += `
-            <div class="empty-message">
-                最近のお知らせはありません
-            </div>
-        `;
-        return;
+      section.insertAdjacentHTML(
+        "beforeend",
+        `<div class="empty-message">最近のお知らせはありません</div>`
+      );
+      return;
     }
 
-    list.innerHTML = data.map(itemHTML).join("");
-}
+    // 最新 5 件に絞る
+    const latestFive = data.slice(0, 5);
 
-function itemHTML(n) {
-    const date = new Date(n.created_at).toLocaleDateString("ja-JP");
+    // HTML 生成
+    list.innerHTML = latestFive.map(renderNewsItem).join("");
 
-    return `
-        <li class="news-item">
-            <div class="news-date">${date}</div>
-            <div class="news-title">${n.title}</div>
-            ${
-                n.url
-                    ? `<div class="news-link"><a href="${n.url}">${n.link_text ?? "詳しくはこちら"}</a></div>`
-                    : ""
-            }
-        </li>
-    `;
+  } catch (err) {
+    console.error("ニュース取得例外:", err);
+    if (loading) loading.remove();
+    section.insertAdjacentHTML(
+      "beforeend",
+      `<div class="empty-message">お知らせの取得に失敗しました</div>`
+    );
+  }
 }
