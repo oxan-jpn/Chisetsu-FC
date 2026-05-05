@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <title>Design Framework Showcase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+            color: #333;
+        }
+        /* Mobile responsiveness */
+        @media (max-width: 860px) {
+            .container {
+                flex-direction: column;
+            }
+            .grid {
+                display: block;
+            }
+            .col {
+                width: 100%;
+            }
+        }
+        /* Card and grid styles */
+        .grid {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .col {
+            flex: 1;
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        /* Alert styles */
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .alert-success { background-color: #dff0d8; color: #3c763d; }
+        .alert-warning { background-color: #fcf8e3; color: #8a6d3b; }
+        .alert-error { background-color: #f2dede; color: #a94442; }
+        .alert-info { background-color: #d9edf7; color: #31708f; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Design Framework Showcase</h1>
+    </header>
+    <main class="container">
+        <section>
+            <h2>Buttons</h2>
+            <button class="primary-btn">Primary</button>
+            <button class="secondary-btn">Secondary</button>
+            <button class="outline-btn">Outline</button>
+            <button class="ghost-btn">Ghost</button>
+        </section>
+        <section>
+            <h2>Forms</h2>
+            <form>
+                <label for="text-input">Input:</label>
+                <input type="text" id="text-input" placeholder="Type here...">
+                <label for="textarea">Textarea:</label>
+                <textarea id="textarea" placeholder="Enter text..."></textarea>
+                <label for="select">Select:</label>
+                <select id="select">
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                </select>
+            </form>
+        </section>
+        <section>
+            <h2>Cards</h2>
+            <div class="grid">
+                <div class="col">
+                    <h3>Card 1</h3>
+                    <p>Card body content here.</p>
+                    <footer>Card footer</footer>
+                </div>
+                <div class="col">
+                    <h3>Card 2</h3>
+                    <p>Card body content here.</p>
+                    <footer>Card footer</footer>
+                </div>
+                <div class="col">
+                    <h3>Card 3</h3>
+                    <p>Card body content here.</p>
+                    <footer>Card footer</footer>
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2>Grid Layouts</h2>
+            <div class="grid">
+                <!-- 2 Column Layout -->
+                <div class="col">Column 1</div>
+                <div class="col">Column 2</div>
+            </div>
+            <div class="grid">
+                <!-- 3 Column Layout -->
+                <div class="col">Column 1</div>
+                <div class="col">Column 2</div>
+                <div class="col">Column 3</div>
+            </div>
+            <div class="grid">
+                <!-- 4 Column Layout -->
+                <div class="col">Column 1</div>
+                <div class="col">Column 2</div>
+                <div class="col">Column 3</div>
+                <div class="col">Column 4</div>
+            </div>
+        </section>
+        <section>
+            <h2>Alerts</h2>
+            <div class="alert alert-success">Success alert</div>
+            <div class="alert alert-warning">Warning alert</div>
+            <div class="alert alert-error">Error alert</div>
+            <div class="alert alert-info">Info alert</div>
+        </section>
+        <section>
+            <h2>Typography</h2>
+            <h1>Heading 1</h1>
+            <h2>Heading 2</h2>
+            <h3>Heading 3</h3>
+            <h4>Heading 4</h4>
+            <h5>Heading 5</h5>
+            <h6>Heading 6</h6>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2026 Design Framework</p>
+    </footer>
+</body>
+</html>
