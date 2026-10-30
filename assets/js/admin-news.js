@@ -80,8 +80,6 @@ const editSubmitButton = document.getElementById("editSubmit");
 const deleteSelect = document.getElementById("deleteSelect");
 const deleteSubmitButton = document.getElementById("deleteSubmit");
 
-const inlineMessage = document.getElementById("inlineMessage");
-const toast = document.getElementById("toast");
 
 const modalOverlay = document.getElementById("modalOverlay");
 const modalTitle = document.getElementById("modalTitle");
@@ -259,7 +257,7 @@ async function handleCreateSubmit() {
     return;
   }
 
-  showInlineMessage("投稿しました");
+  showToast("お知らせを投稿しました");
   resetCreateForm();
 }
 
@@ -357,7 +355,7 @@ async function handleEditSubmit() {
     return;
   }
 
-  showInlineMessage("更新しました");
+  showToast("お知らせを更新しました");
   await populateSelect(editSelect);
 }
 
@@ -419,7 +417,7 @@ async function handleModalConfirm() {
   }
 
   resetModeToCreate();
-  showToast("削除しました");
+  showToast("お知らせを削除しました");
 }
 
 function resetModeToCreate() {
@@ -435,19 +433,5 @@ function resetModeToCreate() {
 // ==============================
 // メッセージ / トースト
 // ==============================
-function showInlineMessage(message) {
-  inlineMessage.textContent = message;
-}
 
-function clearInlineMessage() {
-  inlineMessage.textContent = "";
-}
 
-function showToast(message) {
-  toast.textContent = message;
-  toast.classList.add("toast--visible");
-
-  setTimeout(() => {
-    toast.classList.remove("toast--visible");
-  }, 3000);
-}
