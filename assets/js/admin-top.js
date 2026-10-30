@@ -51,7 +51,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
     logoutBtn.classList.remove("loading");
     logoutBtn.textContent = "ログアウト";
     console.error(error);
-    alert("ログアウトに失敗しました");
+    showInlineMessage("ログアウトに失敗しました");
     return;
   }
 

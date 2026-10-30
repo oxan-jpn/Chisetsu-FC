@@ -18,8 +18,6 @@ const createSection = document.getElementById("createSection");
 const editSection = document.getElementById("editSection");
 const resultSection = document.getElementById("resultSection");
 
-const inlineMessage = document.getElementById("inlineMessage");
-const toast = document.getElementById("toast");
 
 // --- 予定入力 ---
 const createDateInput = document.getElementById("createDate");
@@ -349,19 +347,5 @@ function handleModalConfirm() {
 // ==============================
 // メッセージ / トースト
 // ==============================
-function showInlineMessage(message) {
-  inlineMessage.textContent = message;
-}
 
-function clearInlineMessage() {
-  inlineMessage.textContent = "";
-}
 
-function showToast(message) {
-  toast.textContent = message;
-  toast.classList.add("toast--visible");
-
-  setTimeout(() => {
-    toast.classList.remove("toast--visible");
-  }, 3000);
-}
