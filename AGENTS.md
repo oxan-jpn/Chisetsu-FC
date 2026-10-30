@@ -38,3 +38,4 @@
 - Supabase の権限と安全な扱い：`.github/skills/supabase-safety/SKILL.md`
 - 開発の進め方と検証：`.github/skills/dev-workflow/SKILL.md`
 - コードレビュー：`.github/skills/code-review/SKILL.md`
+- アクセシビリティ：`.github/skills/accessibility/SKILL.md`
