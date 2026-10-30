@@ -151,9 +151,9 @@ async function generateIndexPage() {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>お知らせ一覧</title>
-  <link rel="stylesheet" href="../../assets/css/news-list.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
-<body>
+<body class="news-list-page">
   <div class="container">
     <h1>お知らせ一覧</h1>
     ${itemsHtml}
