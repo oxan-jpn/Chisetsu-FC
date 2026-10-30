@@ -17,7 +17,6 @@ description: Chisetsu-FC（池雪FC公式サイト）のリポジトリ構成と
 - `assets/images/`：画像。emblem.png（約1.4MB）や soccer.png（約1.8MB）など重いファイルがあるので、追加する画像は圧縮してから置く
 - `scripts/generate-news.js`：お知らせの静的ページ生成スクリプト
 - `components/header.html`：共通ヘッダーの下書きで、まだどのページからも読み込まれていない（issue #10）。トップページには同じ体裁のヘッダーが直接書かれている
-- `copilot/`：デザイン実験の残骸で、本番ページからは参照されていない（issue #23）
 
 ## データの流れ
 
