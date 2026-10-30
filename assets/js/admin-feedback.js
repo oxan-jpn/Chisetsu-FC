@@ -10,7 +10,7 @@ function showToast(message) {
 
   setTimeout(() => {
     toast.classList.remove("toast--visible");
-  }, 3000);
+  }, 5000);
 }
 
 function showInlineMessage(message) {

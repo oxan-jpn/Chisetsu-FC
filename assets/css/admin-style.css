@@ -175,7 +175,7 @@ h2 {
   --primary-dark: #166fbe;
   --danger: #d32f2f;
   --danger-dark: #b71c1c;
-  --success: #4CAF50;
+  --success: #2E7D32;
   --border: #ccc;
   --bg: #f7f9fc;
   --text-main: #333;
@@ -340,6 +340,12 @@ button.secondary:hover {
 .toast--visible {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    transition: none;
+  }
 }
 
 /* モーダル */
@@ -576,31 +582,6 @@ button.secondary:hover {
   color: #d32f2f;
   font-weight: 600;
   min-height: 20px;
-}
-
-/* ==============================
-   トースト
-============================== */
-.toast {
-  position: fixed;
-  top: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #88ff99;
-  color: #fff;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  z-index: 1000;
-}
-
-.toast--visible {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
 }
 
 /* ==============================
