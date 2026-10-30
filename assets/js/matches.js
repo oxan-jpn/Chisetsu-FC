@@ -1,6 +1,16 @@
 // assets/js/matches.js
 import { supabase } from "./supabaseClient.js";
 
+// HTMLエスケープ（news.js の escapeHTML と同等。null は空文字として扱う）
+function escapeHTML(str) {
+    return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     loadMatches();
 });
@@ -71,9 +81,9 @@ function renderScheduleRow(m) {
     return `
         <tr>
             <td>${date}</td>
-            <td>${m.kickoff}</td>
-            <td>${m.location}</td>
-            <td>${m.opponent}</td>
+            <td>${escapeHTML(m.kickoff)}</td>
+            <td>${escapeHTML(m.location)}</td>
+            <td>${escapeHTML(m.opponent)}</td>
         </tr>
     `;
 }
@@ -87,7 +97,7 @@ function renderResultRow(m) {
             <tr>
                 <td>${date}</td>
                 <td>未入力</td>
-                <td>${m.opponent}</td>
+                <td>${escapeHTML(m.opponent)}</td>
             </tr>
         `;
     }
@@ -102,8 +112,8 @@ function renderResultRow(m) {
     return `
         <tr>
             <td>${date}</td>
-            <td>${label} ${m.score_for} - ${m.score_against}</td>
-            <td>${m.opponent}</td>
+            <td>${label} ${escapeHTML(m.score_for)} - ${escapeHTML(m.score_against)}</td>
+            <td>${escapeHTML(m.opponent)}</td>
         </tr>
     `;
 }
