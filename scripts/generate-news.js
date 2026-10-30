@@ -47,6 +47,18 @@ function formatDisplayDate(dateStr) {
 }
 
 /* ============================================================
+   HTMLエスケープ（news.js の escapeHTML と同等。null は空文字）
+============================================================ */
+function escapeHTML(str) {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/* ============================================================
    Supabase から単体記事を取得
 ============================================================ */
 async function fetchOneNews(id) {
@@ -132,7 +144,7 @@ async function generateIndexPage() {
       return `
         <div class="news-item">
           <div class="news-date">${date}</div>
-          <a class="news-title" href="./${filename}">${n.title}</a>
+          <a class="news-title" href="./${filename}">${escapeHTML(n.title)}</a>
         </div>
       `;
     })
@@ -181,21 +193,21 @@ function generateDetailPage(item, filePath) {
   html = html.replace(
     /{{#if image_url}}[\s\S]*?{{\/if}}/g,
     item.image_url
-      ? `<img src="${item.image_url}" alt="" class="news-image">`
+      ? `<img src="${escapeHTML(item.image_url)}" alt="" class="news-image">`
       : ""
   );
 
-  const bodyHtml = (item.body ?? "")
-    .trim()
+  const bodyHtml = escapeHTML((item.body ?? "").trim())
     .replace(/\n/g, "<br>");
 
   const summary = (item.body ?? "").slice(0, 80);
 
+  // 置換文字列の $ パターン解釈を避けるため、関数形式で渡す
   html = html
-    .replace(/{{title}}/g, item.title ?? "")
-    .replace(/{{date}}/g, formatDisplayDate(item.created_at))
-    .replace(/{{body}}/g, bodyHtml)
-    .replace(/{{body_summary}}/g, summary);
+    .replace(/{{title}}/g, () => escapeHTML(item.title ?? ""))
+    .replace(/{{date}}/g, () => formatDisplayDate(item.created_at))
+    .replace(/{{body}}/g, () => bodyHtml)
+    .replace(/{{body_summary}}/g, () => escapeHTML(summary));
 
   fs.writeFileSync(filePath, html);
   console.log("Generated:", filePath);
