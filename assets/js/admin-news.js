@@ -41,6 +41,47 @@ function getUploadErrorMessage(error) {
 }
 
 // ==============================
+// アップロード前の画像リサイズ・圧縮
+// 長辺 1600px を超える画像は縮小し、JPEG（品質 0.85）に変換する。
+// すでに小さい画像、そのままでは変換できない形式（HEIC 等）は元のファイルを返す。
+// ==============================
+const MAX_IMAGE_EDGE = 1600;
+const RESIZE_SKIP_SIZE = 512 * 1024;
+
+async function prepareImageForUpload(file) {
+  if (!file.type.startsWith("image/")) {
+    return { body: file, name: file.name };
+  }
+
+  try {
+    const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+    const scale = Math.min(1, MAX_IMAGE_EDGE / Math.max(bitmap.width, bitmap.height));
+
+    if (scale === 1 && file.size <= RESIZE_SKIP_SIZE) {
+      bitmap.close();
+      return { body: file, name: file.name };
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.85));
+    if (!blob) {
+      return { body: file, name: file.name };
+    }
+    return { body: blob, name: file.name.replace(/\.[^.]+$/, "") + ".jpg" };
+  } catch {
+    return { body: file, name: file.name };
+  }
+}
+
+// ==============================
 // ボタンローディング制御
 // ==============================
 function startButtonLoading(button, loadingText = "処理中…") {
@@ -221,11 +262,12 @@ async function handleCreateSubmit() {
   let imageUrl = null;
 
   if (file) {
-    const filePath = `news/${Date.now()}_${file.name}`;
+    const prepared = await prepareImageForUpload(file);
+    const filePath = `news/${Date.now()}_${prepared.name}`;
 
     const { data: uploadData, error: uploadError } = await supabaseClient.storage
       .from("news-images")
-      .upload(filePath, file);
+      .upload(filePath, prepared.body);
 
     if (uploadError) {
       stopButtonLoading(createSubmitButton);
@@ -316,11 +358,12 @@ async function handleEditSubmit() {
   let imageUrl = editImageInput.dataset.currentImage || null;
 
   if (file) {
-    const filePath = `news/${Date.now()}_${file.name}`;
+    const prepared = await prepareImageForUpload(file);
+    const filePath = `news/${Date.now()}_${prepared.name}`;
 
     const { error: uploadError } = await supabaseClient.storage
       .from("news-images")
-      .upload(filePath, file);
+      .upload(filePath, prepared.body);
 
     if (uploadError) {
       stopButtonLoading(editSubmitButton);
