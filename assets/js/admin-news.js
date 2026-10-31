@@ -1,12 +1,4 @@
 // ==============================
-// Supabase クライアント
-// ==============================
-const supabaseClient = supabase.createClient(
-  "https://jyzborkzgcmcqousqopx.supabase.co",
-  "sb_publishable_7jkxGmH3RbdzMAU5cPlTBg_LiVad7Aw"
-);
-
-// ==============================
 // 空欄 → null 変換
 // ==============================
 function toNullable(value) {

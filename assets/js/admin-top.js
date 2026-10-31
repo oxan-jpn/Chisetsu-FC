@@ -1,14 +1,8 @@
-// Supabase クライアント
-const client = supabase.createClient(
-  "https://jyzborkzgcmcqousqopx.supabase.co",
-  "sb_publishable_7jkxGmH3RbdzMAU5cPlTBg_LiVad7Aw"
-);
-
 // 画面を一旦非表示
 document.body.style.display = "none";
 
 // セッション確認
-client.auth.getSession().then(({ data: { session } }) => {
+supabaseClient.auth.getSession().then(({ data: { session } }) => {
   if (!session) {
     window.location.href = "/Chisetsu-FC/pages/admin/login.html";
   } else {
@@ -17,7 +11,7 @@ client.auth.getSession().then(({ data: { session } }) => {
 });
 
 // セッション変化
-client.auth.onAuthStateChange((event, session) => {
+supabaseClient.auth.onAuthStateChange((event, session) => {
   if (!session) {
     window.location.href = "/Chisetsu-FC/pages/admin/login.html";
   }
@@ -43,7 +37,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   logoutBtn.classList.add("loading");
   logoutBtn.innerHTML = `<span class="spinner"></span> ログアウト中…`;
 
-  const { error } = await client.auth.signOut();
+  const { error } = await supabaseClient.auth.signOut();
 
   if (error) {
     // エラー時は元に戻す

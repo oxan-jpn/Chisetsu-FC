@@ -1,12 +1,4 @@
 // ==============================
-// Supabase クライアント
-// ==============================
-const supabaseClient = supabase.createClient(
-  "https://jyzborkzgcmcqousqopx.supabase.co",
-  "sb_publishable_7jkxGmH3RbdzMAU5cPlTBg_LiVad7Aw"
-);
-
-// ==============================
 // DOM 参照
 // ==============================
 const body = document.body;
