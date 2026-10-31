@@ -200,14 +200,24 @@ function generateDetailPage(item, filePath) {
   const bodyHtml = escapeHTML((item.body ?? "").trim())
     .replace(/\n/g, "<br>");
 
-  const summary = (item.body ?? "").slice(0, 80);
+  // OGP の説明文用に、空白を丸めて先頭80文字を使う
+  const summary = (item.body ?? "").replace(/\s+/g, " ").trim().slice(0, 80);
+
+  const ogImage =
+    item.image_url ||
+    "https://oxan-jpn.github.io/Chisetsu-FC/assets/images/og-logo.png";
+  const ogUrl = `https://oxan-jpn.github.io/Chisetsu-FC/pages/news/${path.basename(filePath)}`;
+  const twitterCard = item.image_url ? "summary_large_image" : "summary";
 
   // 置換文字列の $ パターン解釈を避けるため、関数形式で渡す
   html = html
     .replace(/{{title}}/g, () => escapeHTML(item.title ?? ""))
     .replace(/{{date}}/g, () => formatDisplayDate(item.created_at))
     .replace(/{{body}}/g, () => bodyHtml)
-    .replace(/{{body_summary}}/g, () => escapeHTML(summary));
+    .replace(/{{body_summary}}/g, () => escapeHTML(summary))
+    .replace(/{{og_image}}/g, () => escapeHTML(ogImage))
+    .replace(/{{og_url}}/g, () => escapeHTML(ogUrl))
+    .replace(/{{twitter_card}}/g, () => twitterCard);
 
   fs.writeFileSync(filePath, html);
   console.log("Generated:", filePath);
