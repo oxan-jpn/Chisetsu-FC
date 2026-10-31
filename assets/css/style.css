@@ -193,6 +193,15 @@ table th {
     text-align: left;
 }
 
+.season-select-wrapper {
+  margin-bottom: 12px;
+}
+
+.season-select-wrapper select {
+  padding: 6px 8px;
+  font-size: 14px;
+}
+
 .record-summary {
     margin-top: 12px;
     font-weight: 600;

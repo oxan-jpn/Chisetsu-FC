@@ -117,10 +117,17 @@ async function loadAllMatches() {
 // ==============================
 // 年度セレクト
 // ==============================
+// 年度（4月始まり）の開始年を返す。例：2027年2月 → 2026年度
+function seasonOf(dateStr) {
+  const year = Number(dateStr.slice(0, 4));
+  const month = Number(dateStr.slice(5, 7));
+  return month >= 4 ? year : year - 1;
+}
+
 function populateYearSelect() {
   yearSelect.innerHTML = "";
 
-  const years = [...new Set(allMatches.map(m => m.date.slice(0, 4)))].sort();
+  const years = [...new Set(allMatches.map(m => seasonOf(m.date)))].sort((a, b) => a - b);
 
   years.forEach(year => {
     const opt = document.createElement("option");
@@ -136,7 +143,7 @@ function populateYearSelect() {
 function updateMatchSelects() {
   const selectedYear = yearSelect.value;
 
-  const filtered = allMatches.filter(m => m.date.startsWith(selectedYear));
+  const filtered = allMatches.filter(m => seasonOf(m.date) === Number(selectedYear));
 
   // 予定修正
   editSelect.innerHTML = "";

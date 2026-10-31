@@ -15,6 +15,13 @@ document.addEventListener("DOMContentLoaded", () => {
     loadMatches();
 });
 
+// 年度（4月始まり）の開始年を返す。例：2027年2月 → 2026年度
+function seasonOf(dateStr) {
+    const year = Number(dateStr.slice(0, 4));
+    const month = Number(dateStr.slice(5, 7));
+    return month >= 4 ? year : year - 1;
+}
+
 async function loadMatches() {
     const scheduleBody = document.getElementById("schedule-body");
     const resultsBody = document.getElementById("results-body");
@@ -66,11 +73,37 @@ async function loadMatches() {
     }
 
     // -------------------------
+    // 年度セレクト（過去シーズンを遡れるようにする）
+    // -------------------------
+    const seasonSelect = document.getElementById("season-select");
+    const seasons = [...new Set(results.map(m => seasonOf(m.date)))].sort((a, b) => b - a);
+    if (seasonSelect) {
+        seasonSelect.innerHTML =
+            `<option value="">全期間</option>` +
+            seasons.map(sv => `<option value="${sv}">${sv}年度</option>`).join("");
+        // 初期表示は、結果がある一番新しい年度
+        seasonSelect.value = seasons.length > 0 ? String(seasons[0]) : "";
+        seasonSelect.addEventListener("change", () => {
+            renderResults(results, seasonSelect.value);
+        });
+    }
+
+    renderResults(results, seasonSelect ? seasonSelect.value : "");
+}
+
+// 選択中の年度（空文字は全期間）で結果テーブルと戦績サマリーを描画する
+function renderResults(results, selectedSeason) {
+    const resultsBody = document.getElementById("results-body");
+    const filtered = selectedSeason === ""
+        ? results
+        : results.filter(m => seasonOf(m.date) === Number(selectedSeason));
+
+    // -------------------------
     // 戦績サマリー（結果入力済みの試合だけを集計）
     // -------------------------
     const summaryEl = document.getElementById("record-summary");
     if (summaryEl) {
-        const played = results.filter(m => m.result !== null);
+        const played = filtered.filter(m => m.result !== null);
         if (played.length > 0) {
             const wins = played.filter(m => m.result === "win").length;
             const draws = played.filter(m => m.result !== "win" && m.result !== "lose").length;
@@ -78,16 +111,18 @@ async function loadMatches() {
             const goalsFor = played.reduce((sum, m) => sum + (Number(m.score_for) || 0), 0);
             const goalsAgainst = played.reduce((sum, m) => sum + (Number(m.score_against) || 0), 0);
             summaryEl.textContent = `戦績：${wins}勝 ${draws}分 ${losses}敗（得点 ${goalsFor} / 失点 ${goalsAgainst}）`;
+        } else {
+            summaryEl.textContent = "";
         }
     }
 
     // -------------------------
     // 結果のレンダリング
     // -------------------------
-    if (results.length === 0) {
+    if (filtered.length === 0) {
         resultsBody.innerHTML = `<tr><td colspan="3">試合結果はありません</td></tr>`;
     } else {
-        resultsBody.innerHTML = results.map(renderResultRow).join("");
+        resultsBody.innerHTML = filtered.map(renderResultRow).join("");
     }
 }
 
