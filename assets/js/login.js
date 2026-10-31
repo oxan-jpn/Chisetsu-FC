@@ -1,11 +1,5 @@
-// Supabase クライアントを作成
-const client = supabase.createClient(
-  "https://jyzborkzgcmcqousqopx.supabase.co",
-  "sb_publishable_7jkxGmH3RbdzMAU5cPlTBg_LiVad7Aw"
-);
-
 // すでにログイン済みなら top.html へ
-client.auth.getSession().then(({ data: { session } }) => {
+supabaseClient.auth.getSession().then(({ data: { session } }) => {
   if (session) {
     window.location.href = "/Chisetsu-FC/pages/admin/top.html";
   }
@@ -48,7 +42,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
   loginBtn.innerHTML = `<span class="spinner"></span> ログイン中...`;
 
   // ログイン実行
-  const { data, error } = await client.auth.signInWithPassword({
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
     email,
     password
   });
