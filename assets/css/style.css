@@ -193,6 +193,11 @@ table th {
     text-align: left;
 }
 
+.record-summary {
+    margin-top: 12px;
+    font-weight: 600;
+}
+
 /* ================================
    Empty State（データなし表示）
 ================================ */

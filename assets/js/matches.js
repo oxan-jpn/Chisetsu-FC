@@ -66,6 +66,22 @@ async function loadMatches() {
     }
 
     // -------------------------
+    // 戦績サマリー（結果入力済みの試合だけを集計）
+    // -------------------------
+    const summaryEl = document.getElementById("record-summary");
+    if (summaryEl) {
+        const played = results.filter(m => m.result !== null);
+        if (played.length > 0) {
+            const wins = played.filter(m => m.result === "win").length;
+            const draws = played.filter(m => m.result !== "win" && m.result !== "lose").length;
+            const losses = played.filter(m => m.result === "lose").length;
+            const goalsFor = played.reduce((sum, m) => sum + (Number(m.score_for) || 0), 0);
+            const goalsAgainst = played.reduce((sum, m) => sum + (Number(m.score_against) || 0), 0);
+            summaryEl.textContent = `戦績：${wins}勝 ${draws}分 ${losses}敗（得点 ${goalsFor} / 失点 ${goalsAgainst}）`;
+        }
+    }
+
+    // -------------------------
     // 結果のレンダリング
     // -------------------------
     if (results.length === 0) {
