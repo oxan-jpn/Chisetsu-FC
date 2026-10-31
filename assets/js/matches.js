@@ -78,11 +78,16 @@ async function loadMatches() {
 function renderScheduleRow(m) {
     const date = new Date(m.date).toLocaleDateString("ja-JP");
 
+    // 会場名は Google マップ検索へのリンクにする（URL はエンコード、表示文字列はエスケープ）
+    const location = m.location
+        ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(m.location)}" target="_blank" rel="noopener">${escapeHTML(m.location)}</a>`
+        : "";
+
     return `
         <tr>
             <td>${date}</td>
             <td>${escapeHTML(m.kickoff)}</td>
-            <td>${escapeHTML(m.location)}</td>
+            <td>${location}</td>
             <td>${escapeHTML(m.opponent)}</td>
         </tr>
     `;
