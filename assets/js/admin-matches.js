@@ -30,7 +30,7 @@ const editSubmitButton = document.getElementById("editSubmit");
 const resultSelect = document.getElementById("resultSelect");
 const resultScoreForInput = document.getElementById("resultScoreFor");
 const resultScoreAgainstInput = document.getElementById("resultScoreAgainst");
-const resultResultSelect = document.getElementById("resultResult");
+const resultAuto = document.getElementById("resultAuto");
 const resultSubmitButton = document.getElementById("resultSubmit");
 
 // ==============================
@@ -68,6 +68,9 @@ async function init() {
   modeRadios.forEach((radio) => {
     radio.addEventListener("change", handleModeChange);
   });
+
+  resultScoreForInput.addEventListener("input", updateResultAuto);
+  resultScoreAgainstInput.addEventListener("input", updateResultAuto);
 
   createSubmitButton.addEventListener("click", handleCreateSubmit);
   editSubmitButton.addEventListener("click", handleEditSubmit);
@@ -293,6 +296,28 @@ async function handleEditSubmit() {
 }
 
 // ==============================
+// 勝敗の自動判定（スコアから決める）
+// ==============================
+function judgeResult(scoreFor, scoreAgainst) {
+  if (scoreFor > scoreAgainst) return "win";
+  if (scoreFor < scoreAgainst) return "lose";
+  return "draw";
+}
+
+const RESULT_LABELS = { win: "勝ち", draw: "引き分け", lose: "負け" };
+
+// フォームに自動判定の結果をその場で表示する
+function updateResultAuto() {
+  if (!resultAuto) return;
+  const scoreFor = resultScoreForInput.value;
+  const scoreAgainst = resultScoreAgainstInput.value;
+  resultAuto.textContent =
+    scoreFor === "" || scoreAgainst === ""
+      ? "スコアを入力してください"
+      : RESULT_LABELS[judgeResult(Number(scoreFor), Number(scoreAgainst))];
+}
+
+// ==============================
 // ③ 試合結果入力（新規）
 // ==============================
 async function handleResultSubmit() {
@@ -301,7 +326,6 @@ async function handleResultSubmit() {
   const id = resultSelect.value;
   const scoreFor = resultScoreForInput.value;
   const scoreAgainst = resultScoreAgainstInput.value;
-  const result = resultResultSelect.value;
 
   if (!id) {
     showInlineMessage("結果を入力する試合を選択してください");
@@ -310,18 +334,18 @@ async function handleResultSubmit() {
 
   const missing = [
     scoreFor === "" && "得点",
-    scoreAgainst === "" && "失点",
-    !result && "結果"
+    scoreAgainst === "" && "失点"
   ].filter(Boolean);
   if (missing.length > 0) {
     showInlineMessage(`${missing.join("、")}が未入力です`);
     return;
   }
 
+  // 勝敗はスコアから自動判定して送る
   const payload = {
     score_for: Number(scoreFor),
     score_against: Number(scoreAgainst),
-    result
+    result: judgeResult(Number(scoreFor), Number(scoreAgainst))
   };
 
   startButtonLoading(resultSubmitButton, "登録中…");
@@ -341,7 +365,7 @@ async function handleResultSubmit() {
 
   resultScoreForInput.value = "";
   resultScoreAgainstInput.value = "";
-  resultResultSelect.value = "";
+  updateResultAuto();
 
   await loadAllMatches();
   updateMatchSelects();
