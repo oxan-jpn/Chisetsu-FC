@@ -105,6 +105,32 @@ a:hover {
 /* ================================
    News Item Layout
 ================================ */
+.news-list-page .news-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.news-list-page .news-filter input[type="search"],
+.news-list-page .news-filter select {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.news-list-page .news-filter input[type="search"] {
+  flex: 1;
+  min-width: 160px;
+}
+
+.news-list-page .news-filter-empty {
+  padding: 24px 0;
+  color: #666;
+  text-align: center;
+}
+
 .news-list-page .news-item {
     padding: 12px 0;
     border-bottom: 1px solid #ddd;

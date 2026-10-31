@@ -136,13 +136,63 @@ async function generateIndexPage() {
   // 新しい順
   allNews.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
+  // 月別アーカイブ用に、年月（JST）の一覧を新しい順で作る
+  const yearMonthOf = (createdAt) => {
+    const jst = toJST(createdAt);
+    return `${jst.getFullYear()}-${String(jst.getMonth() + 1).padStart(2, "0")}`;
+  };
+  const months = [...new Set(allNews.map(n => yearMonthOf(n.created_at)))];
+  const archiveOptions = months
+    .map(ym => {
+      const [year, month] = ym.split("-");
+      return `<option value="${ym}">${year}年${Number(month)}月</option>`;
+    })
+    .join("\n        ");
+
+  const filterHtml = `
+    <div class="news-filter">
+      <input type="search" id="newsSearch" placeholder="キーワードで検索" aria-label="お知らせをキーワードで検索">
+      <select id="newsArchive" aria-label="月別アーカイブ">
+        <option value="">すべての月</option>
+        ${archiveOptions}
+      </select>
+    </div>
+    <p id="newsFilterEmpty" class="news-filter-empty" hidden>条件に合うお知らせはありません</p>
+  `;
+
+  const filterScript = `
+  <script>
+  (function () {
+    // お知らせ一覧の絞り込み（キーワード検索と月別アーカイブ）
+    var search = document.getElementById("newsSearch");
+    var archive = document.getElementById("newsArchive");
+    var empty = document.getElementById("newsFilterEmpty");
+    var items = Array.prototype.slice.call(document.querySelectorAll(".news-item"));
+    function applyFilter() {
+      var keyword = search.value.trim().toLowerCase();
+      var ym = archive.value;
+      var visible = 0;
+      items.forEach(function (item) {
+        var match = (!ym || item.dataset.ym === ym) &&
+          (!keyword || item.textContent.toLowerCase().includes(keyword));
+        item.style.display = match ? "" : "none";
+        if (match) visible++;
+      });
+      empty.hidden = visible !== 0;
+    }
+    search.addEventListener("input", applyFilter);
+    archive.addEventListener("change", applyFilter);
+  })();
+  </script>
+  `;
+
   const itemsHtml = allNews
     .map(n => {
       const filename = `${formatDateForFile(n.created_at)}.html`;
       const date = toJST(n.created_at).toLocaleDateString("ja-JP");
 
       return `
-        <div class="news-item">
+        <div class="news-item" data-ym="${yearMonthOf(n.created_at)}">
           <div class="news-date">${date}</div>
           <a class="news-title" href="./${filename}">${escapeHTML(n.title)}</a>
         </div>
@@ -168,9 +218,11 @@ async function generateIndexPage() {
 <body class="news-list-page">
   <div class="container">
     <h1>お知らせ一覧</h1>
+    ${filterHtml}
     ${itemsHtml}
     ${backToTopHtml}
   </div>
+  ${filterScript}
 </body>
 </html>
 `;
