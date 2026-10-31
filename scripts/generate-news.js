@@ -127,7 +127,8 @@ async function fetchAllNewsForIndex() {
 /* ============================================================
    一覧ページ生成
 ============================================================ */
-async function generateIndexPage() {
+// 一覧・詳細の生成で共用する、全件取得（本文が空のものを除き、新しい順）
+async function fetchSortedAllNews() {
   let allNews = await fetchAllNewsForIndex();
 
   // 空データ除外
@@ -135,6 +136,12 @@ async function generateIndexPage() {
 
   // 新しい順
   allNews.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  return allNews;
+}
+
+async function generateIndexPage() {
+  const allNews = await fetchSortedAllNews();
 
   // 月別アーカイブ用に、年月（JST）の一覧を新しい順で作る
   const yearMonthOf = (createdAt) => {
@@ -235,7 +242,15 @@ async function generateIndexPage() {
 /* ============================================================
    詳細ページ生成
 ============================================================ */
-function generateDetailPage(item, filePath) {
+// 前後のお知らせへのリンク（共通ナビゲーションの部品）
+function renderPagerLink(neighbor, kind) {
+  if (!neighbor) return "";
+  const file = `${formatDateForFile(neighbor.created_at)}.html`;
+  const label = kind === "prev" ? "&larr; 前のお知らせ" : "次のお知らせ &rarr;";
+  return `<a class="news-detail-nav-link is-${kind}" href="./${file}"><span class="news-detail-nav-label">${label}</span><span class="news-detail-nav-title">${escapeHTML(neighbor.title ?? "")}</span></a>`;
+}
+
+function generateDetailPage(item, filePath, neighbors = {}) {
   const templatePath = path.join(__dirname, "../pages/news/template.html");
   const template = fs.readFileSync(templatePath, "utf-8");
 
@@ -269,10 +284,39 @@ function generateDetailPage(item, filePath) {
     .replace(/{{body_summary}}/g, () => escapeHTML(summary))
     .replace(/{{og_image}}/g, () => escapeHTML(ogImage))
     .replace(/{{og_url}}/g, () => escapeHTML(ogUrl))
-    .replace(/{{twitter_card}}/g, () => twitterCard);
+    .replace(/{{twitter_card}}/g, () => twitterCard)
+    .replace(/{{prev_link}}/g, () => renderPagerLink(neighbors.prev, "prev"))
+    .replace(/{{next_link}}/g, () => renderPagerLink(neighbors.next, "next"));
 
   fs.writeFileSync(filePath, html);
   console.log("Generated:", filePath);
+}
+
+/* ============================================================
+   詳細ページの全件再生成
+   前後リンクを常に正しく保つため、一覧と同じ全件から作り直す。
+   対象から外れた生成ファイル（削除済みの記事など）は消す。
+============================================================ */
+async function generateAllDetailPages() {
+  const allNews = await fetchSortedAllNews();
+  const outputDir = path.join(__dirname, "../pages/news");
+  const expected = new Set();
+
+  allNews.forEach((item, i) => {
+    const filename = `${formatDateForFile(item.created_at)}.html`;
+    expected.add(filename);
+    generateDetailPage(item, path.join(outputDir, filename), {
+      prev: allNews[i + 1] ?? null,
+      next: allNews[i - 1] ?? null,
+    });
+  });
+
+  for (const name of fs.readdirSync(outputDir)) {
+    if (/^\d{14}\.html$/.test(name) && !expected.has(name)) {
+      fs.rmSync(path.join(outputDir, name), { force: true });
+      console.log("Removed stale:", name);
+    }
+  }
 }
 
 /* ============================================================
@@ -296,17 +340,16 @@ async function main() {
   const filename = `${formatDateForFile(item.created_at)}.html`;
   const filePath = path.join(outputDir, filename);
 
-  // 論理削除
+  // 論理削除（対象ファイルは全件再生成の掃除で消える）
   if (item.is_deleted) {
-    console.log("Logical delete detected. Removing:", filePath);
-    fs.rmSync(filePath, { force: true });
+    console.log("Logical delete detected:", filePath);
+    await generateAllDetailPages();
     await generateIndexPage();
     return;
   }
 
-  // 再生成
-  fs.rmSync(filePath, { force: true });
-  generateDetailPage(item, filePath);
+  // 再生成（前後リンクの波及があるため、詳細ページは全件を作り直す）
+  await generateAllDetailPages();
 
   await markGenerated(item.id);
   await generateIndexPage();

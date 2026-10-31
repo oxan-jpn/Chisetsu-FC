@@ -33,11 +33,17 @@
     <!-- 本文 -->
     <div class="body">{{body}}</div>
 
-    <!-- 戻るボタン -->
-    <div class="back-nav">
-      <a href="../index.html" class="back-button">トップページへ戻る&nbsp;&rang;</a>
-      <a href="/Chisetsu-FC/pages/news/index.html" class="back-button">お知らせ一覧へ戻る&nbsp;&rang;</a>
-    </div>
+    <!-- お知らせ詳細の共通ナビゲーション -->
+    <nav class="news-detail-nav">
+      <div class="news-detail-nav-pager">
+        {{prev_link}}
+        {{next_link}}
+      </div>
+      <div class="back-nav">
+        <a href="../index.html" class="back-button">トップページへ戻る&nbsp;&rang;</a>
+        <a href="./index.html" class="back-button">お知らせ一覧へ戻る&nbsp;&rang;</a>
+      </div>
+    </nav>
 
   </div>
 
