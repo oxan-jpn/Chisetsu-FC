@@ -22,14 +22,14 @@ description: お知らせの投稿から静的ページ生成までの流れと�
 ## 生成物と編集してよい場所
 
 - `pages/news/<日時>.html` と `pages/news/index.html` は生成物なので直接編集しない
-- 詳細ページの体裁は `pages/news/template.html` を直す。プレースホルダは `{{title}}`、`{{date}}`、`{{body}}` と、画像がある場合だけ残る `{{#if image_url}}` ブロック
+- 詳細ページの体裁は `pages/news/template.html` を直す。プレースホルダは `{{title}}`、`{{date}}`、`{{body}}`、前後リンクの `{{prev_link}}`、`{{next_link}}` と、画像がある場合だけ残る `{{#if image_url}}` ブロック
 - 一覧ページの体裁は `scripts/generate-news.js` の generateIndexPage 内のテンプレート文字列を直す
 - 一覧と詳細のスタイルは `assets/css/style.css` 内にある（一覧は `.news-list-page`、詳細は `.news-detail-page` 配下）。一覧ページは `style.css` の参照と body の `news-list-page` クラスが必須
 
 ## 生成スクリプトの動き
 
-- 対象のお知らせを1件取得し、詳細ページを再生成する。`is_deleted` が true の場合は詳細ファイルを削除する
-- 一覧ページは、本文が空でない未削除の全件から毎回作り直す
+- 詳細ページは、前後のお知らせへのリンクを正しく保つため、本文が空でない未削除の全件から毎回作り直す。対象から外れた生成ファイル（削除済みの記事など）はあわせて削除する
+- 一覧ページも、同じ全件から毎回作り直す
 - 本文は改行を `<br>` に変換して埋め込む。タイトルと本文のエスケープ状況は issue #16 を参照
 
 ## 変更したときの確認
