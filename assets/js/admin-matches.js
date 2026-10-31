@@ -41,17 +41,10 @@ const resultScoreAgainstInput = document.getElementById("resultScoreAgainst");
 const resultResultSelect = document.getElementById("resultResult");
 const resultSubmitButton = document.getElementById("resultSubmit");
 
-// --- モーダル ---
-const modalOverlay = document.getElementById("modalOverlay");
-const modalTitle = document.getElementById("modalTitle");
-const modalConfirmButton = document.getElementById("modalConfirm");
-const modalCancelButton = document.getElementById("modalCancel");
-
 // ==============================
 // 状態
 // ==============================
 let allMatches = [];
-let pendingAction = null;
 
 // ==============================
 // 初期化
@@ -59,8 +52,6 @@ let pendingAction = null;
 init();
 
 async function init() {
-  modalOverlay.style.display = "none";
-
   // 認証チェック
   body.style.display = "none";
   const { data } = await supabaseClient.auth.getSession();
@@ -89,9 +80,6 @@ async function init() {
   createSubmitButton.addEventListener("click", handleCreateSubmit);
   editSubmitButton.addEventListener("click", handleEditSubmit);
   resultSubmitButton.addEventListener("click", handleResultSubmit);
-
-  modalConfirmButton.addEventListener("click", handleModalConfirm);
-  modalCancelButton.addEventListener("click", closeModal);
 
   hideAllSections();
 }
@@ -202,8 +190,14 @@ async function handleCreateSubmit() {
   const opponent = createOpponentInput.value.trim();
   const location = createLocationInput.value.trim();
 
-  if (!date || !kickoff || !opponent || !location) {
-    showInlineMessage("必須項目が未入力です");
+  const missing = [
+    !date && "日付",
+    !kickoff && "キックオフ",
+    !opponent && "対戦相手",
+    !location && "会場"
+  ].filter(Boolean);
+  if (missing.length > 0) {
+    showInlineMessage(`${missing.join("、")}が未入力です`);
     return;
   }
 
@@ -217,7 +211,9 @@ async function handleCreateSubmit() {
     result: null
   };
 
+  startButtonLoading(createSubmitButton, "登録中…");
   const { error } = await supabaseClient.from("matches").insert(payload);
+  stopButtonLoading(createSubmitButton);
 
   if (error) {
     console.error(error);
@@ -265,17 +261,25 @@ async function handleEditSubmit() {
   const opponent = editOpponentInput.value.trim();
   const location = editLocationInput.value.trim();
 
-  if (!date || !kickoff || !opponent || !location) {
-    showInlineMessage("必須項目が未入力です");
+  const missing = [
+    !date && "日付",
+    !kickoff && "キックオフ",
+    !opponent && "対戦相手",
+    !location && "会場"
+  ].filter(Boolean);
+  if (missing.length > 0) {
+    showInlineMessage(`${missing.join("、")}が未入力です`);
     return;
   }
 
   const payload = { date, kickoff, opponent, location };
 
+  startButtonLoading(editSubmitButton, "更新中…");
   const { error } = await supabaseClient
     .from("matches")
     .update(payload)
     .eq("id", id);
+  stopButtonLoading(editSubmitButton);
 
   if (error) {
     console.error(error);
@@ -300,8 +304,18 @@ async function handleResultSubmit() {
   const scoreAgainst = resultScoreAgainstInput.value;
   const result = resultResultSelect.value;
 
-  if (!id || scoreFor === "" || scoreAgainst === "" || !result) {
-    showInlineMessage("必須項目が未入力です");
+  if (!id) {
+    showInlineMessage("結果を入力する試合を選択してください");
+    return;
+  }
+
+  const missing = [
+    scoreFor === "" && "得点",
+    scoreAgainst === "" && "失点",
+    !result && "結果"
+  ].filter(Boolean);
+  if (missing.length > 0) {
+    showInlineMessage(`${missing.join("、")}が未入力です`);
     return;
   }
 
@@ -311,10 +325,12 @@ async function handleResultSubmit() {
     result
   };
 
+  startButtonLoading(resultSubmitButton, "登録中…");
   const { error } = await supabaseClient
     .from("matches")
     .update(payload)
     .eq("id", id);
+  stopButtonLoading(resultSubmitButton);
 
   if (error) {
     console.error(error);
@@ -330,18 +346,6 @@ async function handleResultSubmit() {
 
   await loadAllMatches();
   updateMatchSelects();
-}
-
-// ==============================
-// モーダル（必要最低限）
-// ==============================
-function closeModal() {
-  modalOverlay.style.display = "none";
-  pendingAction = null;
-}
-
-function handleModalConfirm() {
-  closeModal();
 }
 
 // ==============================

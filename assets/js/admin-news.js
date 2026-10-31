@@ -41,22 +41,6 @@ function getUploadErrorMessage(error) {
 }
 
 // ==============================
-// ボタンローディング制御
-// ==============================
-function startButtonLoading(button, loadingText = "処理中…") {
-  button.dataset.originalText = button.textContent;
-  button.textContent = loadingText;
-  button.classList.add("button--loading");
-  button.disabled = true;
-}
-
-function stopButtonLoading(button) {
-  button.textContent = button.dataset.originalText;
-  button.classList.remove("button--loading");
-  button.disabled = false;
-}
-
-// ==============================
 // DOM 参照
 // ==============================
 const body = document.body;
