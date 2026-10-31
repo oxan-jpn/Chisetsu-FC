@@ -568,6 +568,12 @@ html {
   font-size: 15px;
 }
 
+.back-nav {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
 .news-detail-page .back-button:hover {
   background: #ddd;
 }
