@@ -182,16 +182,19 @@ input, textarea, select {
 ============================== */
 
 body {
-  align-items: center;
-  min-height: 100dvh;
-  height: auto;
-  display: flex;
-  justify-content: center;
   font-family: "Helvetica Neue", Arial, sans-serif;
   margin: 0;
   padding: 20px;
   background: #f7f7f7;
   color: var(--text-main);
+}
+
+/* ログイン画面だけ、画面中央に寄せる */
+body.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100dvh;
 }
 
 .container {
