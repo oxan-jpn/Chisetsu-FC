@@ -11,18 +11,36 @@ client.auth.getSession().then(({ data: { session } }) => {
   }
 });
 
+// Supabase のエラーを、利用者向けの日本語の定型文に置き換える
+function loginErrorMessage(error) {
+  const code = error?.code || "";
+  const message = error?.message || "";
+
+  if (code === "invalid_credentials" || message.includes("Invalid login credentials")) {
+    return "メールアドレスまたはパスワードが正しくありません";
+  }
+  if (code === "email_not_confirmed" || message.includes("Email not confirmed")) {
+    return "メールアドレスの確認が完了していません。確認メールをご確認ください";
+  }
+  if (error?.name === "AuthRetryableFetchError" || message.toLowerCase().includes("fetch")) {
+    return "ネットワークエラーが発生しました。通信環境を確認してください";
+  }
+  return "ログインに失敗しました。時間をおいて再度お試しください";
+}
+
 // ログイン処理
 document.getElementById("loginBtn").addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
-  const errorBox = document.getElementById("error");
   const loginBtn = document.getElementById("loginBtn");
 
-  // 入力チェック
+  // 入力チェック（エラー表示は他画面と共通のインライン表示を使う）
   if (!email || !password) {
-    errorBox.textContent = "メールアドレスとパスワードを入力してください";
+    showInlineMessage("メールアドレスとパスワードを入力してください");
     return;
   }
+
+  clearInlineMessage();
 
   // --- ログイン中 UI（多重クリック防止） ---
   loginBtn.disabled = true;
@@ -37,7 +55,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 
   // --- ログイン失敗 ---
   if (error) {
-    errorBox.textContent = `ログインに失敗しました：${error.message}`;
+    showInlineMessage(loginErrorMessage(error));
 
     // ボタンを元に戻す
     loginBtn.disabled = false;
