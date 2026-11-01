@@ -432,3 +432,8 @@ button.secondary:hover {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
+/* 共通ヘッダーを画面の端まで広げる（body の余白を打ち消す） */
+#site-header {
+  margin: -20px -20px 20px;
+}
