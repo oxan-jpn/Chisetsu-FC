@@ -222,8 +222,11 @@ async function generateIndexPage() {
   <title>お知らせ一覧</title>
   <link rel="stylesheet" href="../../assets/css/base.css">
   <link rel="stylesheet" href="../../assets/css/style.css">
+  <script src="../../assets/js/site-header.js" defer></script>
 </head>
 <body class="news-list-page">
+  <!-- 共通ヘッダー（components/header.html を JavaScript で読み込む） -->
+  <div id="site-header"></div>
   <div class="container">
     <h1>お知らせ一覧</h1>
     ${filterHtml}

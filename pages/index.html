@@ -16,19 +16,12 @@
   <script type="module" src="../assets/js/main.js"></script>
   <script type="module" src="../assets/js/matches.js"></script>
   <script type="module" src="../assets/js/news.js"></script>
+  <script src="../assets/js/site-header.js" defer></script>
 </head>
 
 <body class="top-page">
-  <!-- Header Section (will be loaded via JS from /components/header.html) -->
-  <header class="chisetsu-header">
-    <div class="header-left">
-      <div class="team-emblem"></div>
-    </div>
-    <div class="header-center">
-      <p class="team-name">Chisetsu FC</p>
-    </div>
-    <div class="header-right"></div>
-  </header>
+  <!-- 共通ヘッダー（components/header.html を JavaScript で読み込む） -->
+  <div id="site-header"></div>
   <!-- Hero Section -->
   <section id="hero">
     <img src="../assets/images/top-image.jpeg" />

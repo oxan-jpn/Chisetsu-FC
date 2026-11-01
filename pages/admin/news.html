@@ -7,10 +7,13 @@
 
   <link rel="stylesheet" href="../../assets/css/base.css" />
   <link rel="stylesheet" href="../../assets/css/admin-style.css" />
+  <script src="../../assets/js/site-header.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.min.js" integrity="sha384-UagCvVPT5XXA0Hx+nJYUAGBFseHT9zBgpJMSebsAxl9lciTwbT+39j5VfRjdP5Tp" crossorigin="anonymous"></script>
   <script src="../../assets/js/admin-supabase.js"></script>
 </head>
 <body>
+  <!-- 共通ヘッダー（components/header.html を JavaScript で読み込む） -->
+  <div id="site-header"></div>
   <!-- トースト -->
   <div id="toast" class="toast" aria-live="polite"></div>
 
