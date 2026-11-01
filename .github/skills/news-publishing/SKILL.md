@@ -24,7 +24,7 @@ description: お知らせの投稿から静的ページ生成までの流れと�
 - `pages/news/<日時>.html` と `pages/news/index.html` は生成物なので直接編集しない
 - 詳細ページの体裁は `pages/news/template.html` を直す。プレースホルダは `{{title}}`、`{{date}}`、`{{body}}`、前後リンクの `{{prev_link}}`、`{{next_link}}` と、画像がある場合だけ残る `{{#if image_url}}` ブロック
 - 一覧ページの体裁は `scripts/generate-news.js` の generateIndexPage 内のテンプレート文字列を直す
-- 一覧と詳細のスタイルは `assets/css/style.css` 内にある（一覧は `.news-list-page`、詳細は `.news-detail-page` 配下）。一覧ページは `style.css` の参照と body の `news-list-page` クラスが必須
+- 一覧と詳細のスタイルは `assets/css/style.css` 内にある（一覧は `.news-list-page`、詳細は `.news-detail-page` 配下）。お知らせリスト項目の共通スタイル（`.news-link-wrapper` など）は `assets/css/base.css` にある。一覧ページは `style.css` の参照と body の `news-list-page` クラスが必須
 
 ## 生成スクリプトの動き
 

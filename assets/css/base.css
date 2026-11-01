@@ -114,3 +114,45 @@
         height: 80px;
     }
 }
+
+/* ---------- お知らせリストの項目（トップページ・一覧ページ共通） ---------- */
+.news-link-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.news-link-wrapper:hover {
+    text-decoration: none;
+}
+
+.news-item-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.news-chevron {
+    flex-shrink: 0;
+    color: #9ca3af;
+    font-size: 22px;
+    line-height: 1;
+}
+
+body .news-item:hover {
+    background-color: #eef4fb;
+}
+
+body .news-item:active {
+    background-color: #e1ecf8;
+}
+
+.news-link-wrapper:hover .news-title {
+    text-decoration: underline;
+}
+
+.news-link-wrapper:focus-visible {
+    outline: 2px solid var(--navy);
+    outline-offset: 2px;
+}
