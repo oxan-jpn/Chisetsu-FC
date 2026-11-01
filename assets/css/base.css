@@ -101,3 +101,16 @@
     filter: blur(1px);
   }
 }
+
+/* ---------- 共通ヘッダーの読み込み場所 ---------- */
+/* ヘッダーは JavaScript で読み込むため、高さを先に確保して描画のガタ付きを防ぐ */
+#site-header {
+    display: block;
+    height: 120px;
+}
+
+@media (max-width: 600px) {
+    #site-header {
+        height: 80px;
+    }
+}

@@ -17,7 +17,7 @@ description: Chisetsu-FC（池雪FC公式サイト）のリポジトリ構成と
 - `assets/js/admin-*.js`、`login.js`：管理画面用。jsDelivr の CDN から Supabase をグローバルに読み込み、各ファイルが個別にクライアントを生成している
 - `assets/images/`：画像。emblem.png（約1.4MB）や soccer.png（約1.8MB）など重いファイルがあるので、追加する画像は圧縮してから置く
 - `scripts/generate-news.js`：お知らせの静的ページ生成スクリプト
-- `components/header.html`：共通ヘッダーの下書きで、まだどのページからも読み込まれていない（issue #10）。トップページには同じ体裁のヘッダーが直接書かれている
+- `components/header.html`：共通ヘッダー。`assets/js/site-header.js` が各ページ（ログイン画面を除く）の `#site-header` へ読み込む。読み込み前の高さは `assets/css/base.css` で確保している
 
 ## データの流れ
 
