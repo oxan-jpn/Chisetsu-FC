@@ -477,8 +477,12 @@ html {
 }
 
 .news-detail-page .back-button {
-  display: inline-block;
-  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex: 1;
+  padding: 10px 6px;
   background: #eee;
   color: #333;
   text-decoration: none;
@@ -488,8 +492,15 @@ html {
 
 .back-nav {
     display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* スマホ幅では導線ボタンの文字を少し小さくして横並びを保つ */
+@media (max-width: 600px) {
+  .news-detail-page .back-button {
+    font-size: 13px;
+    line-height: 1.4;
+  }
 }
 
 .news-detail-nav {
