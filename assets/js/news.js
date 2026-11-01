@@ -50,8 +50,11 @@ function renderNewsItem(item) {
   return `
     <li class="news-item">
       <a href="${detailUrl}" class="news-link-wrapper">
-        <div class="news-date">${date}</div>
-        <div class="news-title">${escapeHTML(item.title)}</div>
+        <div class="news-item-main">
+          <div class="news-date">${date}</div>
+          <div class="news-title">${escapeHTML(item.title)}</div>
+        </div>
+        <span class="news-chevron" aria-hidden="true">&rang;</span>
       </a>
     </li>
   `;

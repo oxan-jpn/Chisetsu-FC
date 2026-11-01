@@ -86,7 +86,11 @@ a:hover {
 }
 
 #news-list li {
-    padding: 10px 0;
+    padding: 0;
+}
+
+#news-list .news-link-wrapper {
+    padding: 16px 10px;
     border-bottom: 1px solid #ddd;
 }
 
@@ -330,16 +334,7 @@ table th {
     text-decoration: underline;
 }
 
-.news-link-wrapper {
-  display: block;
-  padding: 8px 0;
-  text-decoration: none;
-  color: inherit;
-}
-
-.news-link-wrapper:hover {
-  opacity: 0.8;
-}
+/* お知らせリスト項目の共通スタイルは assets/css/base.css に集約しています */
 
 /* --- Safari の自動縮小を完全に止める --- */
 html {
@@ -377,11 +372,15 @@ html {
 /* ニュースカード */
 .news-list-page .news-item {
   background: #fff;
-  padding: 20px 22px;
+  padding: 0;
   border-radius: 14px;
   margin-bottom: 16px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.news-list-page .news-link-wrapper {
+  padding: 20px 22px;
 }
 
 /* PC のみホバー */

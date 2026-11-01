@@ -200,8 +200,13 @@ async function generateIndexPage() {
 
       return `
         <div class="news-item" data-ym="${yearMonthOf(n.created_at)}">
-          <div class="news-date">${date}</div>
-          <a class="news-title" href="./${filename}">${escapeHTML(n.title)}</a>
+          <a class="news-link-wrapper" href="./${filename}">
+            <div class="news-item-main">
+              <div class="news-date">${date}</div>
+              <div class="news-title">${escapeHTML(n.title)}</div>
+            </div>
+            <span class="news-chevron" aria-hidden="true">&rang;</span>
+          </a>
         </div>
       `;
     })
