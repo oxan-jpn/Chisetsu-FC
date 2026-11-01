@@ -13,9 +13,14 @@
   <meta property="og:url" content="https://oxan-jpn.github.io/Chisetsu-FC/pages/news/20260420213443.html">
   <meta property="og:type" content="article">
   <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="../../assets/css/base.css">
   <link rel="stylesheet" href="../../assets/css/style.css">
+  <script src="../../assets/js/site-header.js" defer></script>
 </head>
 <body class="news-detail-page">
+
+  <!-- 共通ヘッダー（components/header.html を JavaScript で読み込む） -->
+  <div id="site-header"></div>
 
   <div class="container">
 
@@ -29,15 +34,19 @@
     
 
     <!-- 本文 -->
-    <div class="body">
-      フットボールクラブさんとフレンドリーマッチを行いました！<br>20分×3<br>0-2<br>0-2<br>1-0<br>惨敗でディフェンスの裏を取られたシーンが多く、失点パターンが同じだったためチームの課題が浮き彫りになりました。これからの練習でディフェンスの連携強化を図っていきます！<br>フットボールさんありがとうございました！
-    </div>
+    <div class="body">フットボールクラブさんとフレンドリーマッチを行いました！<br>20分×3<br>0-2<br>0-2<br>1-0<br>惨敗でディフェンスの裏を取られたシーンが多く、失点パターンが同じだったためチームの課題が浮き彫りになりました。これからの練習でディフェンスの連携強化を図っていきます！<br>フットボールさんありがとうございました！</div>
 
-    <!-- 戻るボタン -->
-    <div class="back-nav">
-      <a href="../index.html" class="back-button">トップページへ戻る&nbsp;&rang;</a>
-      <a href="/Chisetsu-FC/pages/news/index.html" class="back-button">お知らせ一覧へ戻る&nbsp;&rang;</a>
-    </div>
+    <!-- お知らせ詳細の共通ナビゲーション -->
+    <nav class="news-detail-nav">
+      <div class="news-detail-nav-pager">
+        <a class="news-detail-nav-link is-prev" href="./20260316000000.html"><span class="news-detail-nav-label">&larr; 前のお知らせ</span><span class="news-detail-nav-title">⚽池雪FCのホームページを開設しました！！</span></a>
+        
+      </div>
+      <div class="back-nav">
+        <a href="../index.html" class="back-button">トップページへ戻る&nbsp;&rang;</a>
+        <a href="./index.html" class="back-button">お知らせ一覧へ戻る&nbsp;&rang;</a>
+      </div>
+    </nav>
 
   </div>
 
