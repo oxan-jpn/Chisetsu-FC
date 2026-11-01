@@ -68,16 +68,6 @@ input {
 
 /* スピナー */
 
-:root {
-  --primary: #1E88E5;
-  --primary-dark: #166fbe;
-  --danger: #d32f2f;
-  --danger-dark: #b71c1c;
-  --success: #2E7D32;
-  --border: #ccc;
-  --bg: #f7f9fc;
-  --text-main: #333;
-}
 
 *, *::before, *::after {
   box-sizing: border-box;

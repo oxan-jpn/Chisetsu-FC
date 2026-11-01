@@ -1,0 +1,103 @@
+/* ================================
+   共通デザイン基盤
+   変数（デザイントークン）と共通部品をここに集約する。
+   各画面の CSS より前に読み込むこと。
+================================ */
+
+/* ---------- デザイントークン ---------- */
+:root {
+    /* 公開側 */
+    --main-red: #D62828;
+    --white: #FFFFFF;
+    --navy: #003049;
+    --gray-bg: #F5F5F5;
+    --text-dark: #222;
+    /* 管理側 */
+    --primary: #1E88E5;
+    --primary-dark: #166fbe;
+    --danger: #d32f2f;
+    --danger-dark: #b71c1c;
+    --success: #2E7D32;
+    --border: #ccc;
+    --bg: #f7f9fc;
+    --text-main: #333;
+}
+
+/* ---------- 共通ヘッダー ---------- */
+/* 全体構成 */
+.chisetsu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 120px;
+  width: 100%;
+  background-color: #fff;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 左端の赤帯 */
+.header-left {
+  background-color: #c60000;
+  width: 80px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* チームエンブレム（背景画像で差し替え） */
+.team-emblem {
+  width: 60px;
+  height: 60px;
+  background-image: url('../images/emblem.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* 中央のチーム名 */
+.header-center {
+  flex: 1;
+  text-align: center;
+}
+
+.team-name {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+/* 右端のぼかし背景 */
+.header-right {
+  width: 220px;
+  height: 100%;
+  background: linear-gradient(to right, rgba(255,255,255,0.8), rgba(255,255,255,0)),
+              url('../images/soccer.png');
+  background-size: cover;
+  background-position: center;
+  filter: blur(2px);
+}
+
+/* スマホ対応 */
+@media (max-width: 600px) {
+  .chisetsu-header {
+    height: 80px;
+  }
+  .header-left {
+    width: 60px;
+  }
+  .team-emblem {
+    width: 40px;
+    height: 40px;
+  }
+  .team-name {
+    font-size: 1.4rem;
+  }
+  .header-right {
+    width: 120px;
+    filter: blur(1px);
+  }
+}
