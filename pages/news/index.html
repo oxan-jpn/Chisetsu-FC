@@ -5,19 +5,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>お知らせ一覧</title>
+  <link rel="stylesheet" href="../../assets/css/base.css">
   <link rel="stylesheet" href="../../assets/css/style.css">
+  <script src="../../assets/js/site-header.js" defer></script>
 </head>
 <body class="news-list-page">
+  <!-- 共通ヘッダー（components/header.html を JavaScript で読み込む） -->
+  <div id="site-header"></div>
   <div class="container">
     <h1>お知らせ一覧</h1>
     
-        <div class="news-item">
+    <div class="news-filter">
+      <input type="search" id="newsSearch" placeholder="キーワードで検索" aria-label="お知らせをキーワードで検索">
+      <select id="newsArchive" aria-label="月別アーカイブ">
+        <option value="">すべての月</option>
+        <option value="2026-04">2026年4月</option>
+        <option value="2026-03">2026年3月</option>
+      </select>
+    </div>
+    <p id="newsFilterEmpty" class="news-filter-empty" hidden>条件に合うお知らせはありません</p>
+  
+    
+        <div class="news-item" data-ym="2026-04">
           <div class="news-date">2026/4/20</div>
           <a class="news-title" href="./20260420213443.html">フレンドリーマッチを行いました！</a>
         </div>
       
 
-        <div class="news-item">
+        <div class="news-item" data-ym="2026-03">
           <div class="news-date">2026/3/16</div>
           <a class="news-title" href="./20260316000000.html">⚽池雪FCのホームページを開設しました！！</a>
         </div>
@@ -28,5 +43,30 @@
     </div>
   
   </div>
+  
+  <script>
+  (function () {
+    // お知らせ一覧の絞り込み（キーワード検索と月別アーカイブ）
+    var search = document.getElementById("newsSearch");
+    var archive = document.getElementById("newsArchive");
+    var empty = document.getElementById("newsFilterEmpty");
+    var items = Array.prototype.slice.call(document.querySelectorAll(".news-item"));
+    function applyFilter() {
+      var keyword = search.value.trim().toLowerCase();
+      var ym = archive.value;
+      var visible = 0;
+      items.forEach(function (item) {
+        var match = (!ym || item.dataset.ym === ym) &&
+          (!keyword || item.textContent.toLowerCase().includes(keyword));
+        item.style.display = match ? "" : "none";
+        if (match) visible++;
+      });
+      empty.hidden = visible !== 0;
+    }
+    search.addEventListener("input", applyFilter);
+    archive.addEventListener("change", applyFilter);
+  })();
+  </script>
+  
 </body>
 </html>
