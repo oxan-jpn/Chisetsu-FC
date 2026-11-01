@@ -10,6 +10,7 @@ description: Chisetsu-FC（池雪FC公式サイト）のリポジトリ構成と
 - `pages/`：公開ページ置き場。トップページは `pages/index.html` で、リポジトリ直下に index.html はない
 - `pages/admin/`：管理画面（login、top、news、matches）。Supabase Auth でログインした人だけが使える
 - `pages/news/`：お知らせの一覧と詳細。詳細ページと一覧ページは自動生成される（news-publishing skill 参照）
+- `assets/css/base.css`：共通デザイン基盤。変数（デザイントークン）と共通ヘッダーなどの共通部品を集約し、公開・管理のどちらの画面でも各画面の CSS より前に読み込む
 - `assets/css/style.css`：公開ページ用のスタイルを1ファイルに統合したもの。ローディング表示やお知らせ一覧（`.news-list-page`）、詳細（`.news-detail-page`）のスタイルも後半のセクションに入っている
 - `assets/css/admin-style.css`：管理画面用のスタイル
 - `assets/js/`：公開側は ES モジュールで、`news.js` と `matches.js` が共通クライアント `supabaseClient.js` を読み込む。`main.js` はトップへ戻るボタンのみ
