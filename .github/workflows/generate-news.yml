@@ -23,7 +23,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: dev/copilot
+          ref: master
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
